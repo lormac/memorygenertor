@@ -460,27 +460,18 @@ async function loadSlidesFromTheme() {
   "Unlocked: " + escapeHtml(theme.name || "Theme");
 }
 slides.sort(compareSlides);
-
 buildSlideForms();
 renderTimeline(0);
 
-if (typeof buildSlideDropdown === "function") {
-  buildSlideDropdown();
-}
-
 if (slides.length) {
   currentSlideIndex = 0;
-
-  if (els.slideSelect) {
-    els.slideSelect.value = "0";
-  }
-
-  if (typeof showSelectedSlideEditor === "function") {
-    showSelectedSlideEditor(0);
-  }
-
   await drawSlide(0);
 }
+
+els.loadStatus.innerHTML =
+  "Unlocked Product: " + escapeHtml(theme.name || "Theme");
+
+els.status.textContent = "Product loaded.";
 
 els.loadStatus.innerHTML =
   "Unlocked Product: " + escapeHtml(theme.name || "Theme");
