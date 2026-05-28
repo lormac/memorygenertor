@@ -411,7 +411,12 @@ function showSelectedSlideEditor(index) {
   els.slideEditor.appendChild(wrapper);
 }
 
-
+function resolveThemePath(path) {
+  if (/^https?:\/\//i.test(path)) return path;
+  if (path.startsWith(theme.__folder + "/")) return path;
+  if (path.startsWith("themes/")) return path;
+  return theme.__folder + "/" + path.replace(/^\/+/, "");
+}
 async function loadSlidesFromTheme() {
   slides = [];
   imageCache = {};
