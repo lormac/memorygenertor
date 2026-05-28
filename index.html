@@ -458,6 +458,7 @@ async function loadSlidesFromTheme() {
 
   els.loadStatus.innerHTML =
   "Unlocked: " + escapeHtml(theme.name || "Theme");
+  els.status.textContent = "Product loaded.";
 }
 slides.sort(compareSlides);
 buildSlideForms();
