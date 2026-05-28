@@ -220,7 +220,7 @@ code{color:#ffef9b}
 */
 
 const ACCESS_CODES_URL = "data/access_codes.json";
-
+const completedSlides = new Set();
 const FALLBACK_TEXT_STYLES = {
   default: {
     fontFamily: "Arial Black, Arial, sans-serif",
@@ -379,6 +379,38 @@ async function loadThemeFonts() {
     await document.fonts.ready;
   }
 }
+function buildSlideDropdown() {
+  els.slideSelect.innerHTML = "";
+
+  slides.forEach((slide, index) => {
+    const option = document.createElement("option");
+
+    const isComplete = completedSlides.has(index);
+    const check = isComplete ? "✅ " : "";
+
+    option.value = index;
+    option.textContent = check + "Slide " + (index + 1) + " - " + (slide.name || slide.title || "Edit");
+
+    els.slideSelect.appendChild(option);
+  });
+}
+
+function showSelectedSlideEditor(index) {
+  els.slideEditor.innerHTML = "";
+
+  const slide = slides[index];
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "slide-editor active-slide-editor";
+
+  wrapper.innerHTML = `
+    <h3>Slide ${index + 1}</h3>
+    <!-- put your existing slide editing fields here -->
+  `;
+
+  els.slideEditor.appendChild(wrapper);
+}
+
 
 async function loadSlidesFromTheme() {
   slides = [];
