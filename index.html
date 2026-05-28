@@ -160,10 +160,10 @@ code{color:#ffef9b}
       <div class="section-title">Your Product</div>
       <div id="loadStatus" class="status">Loading...</div>
 
-     <label for="slideSelect">Choose a slide to edit:</label>
+<label for="slideSelect">Choose a slide to edit:</label>
 <select id="slideSelect"></select>
 
-<div id="slideEditor"></div>
+<div id="slideForms"></div>
 
       <div class="section-title">Music And Export</div>
       <label for="musicInput">Optional Music</label>
@@ -382,20 +382,37 @@ async function loadThemeFonts() {
   }
 }
 function buildSlideDropdown() {
-  if (!els.slideSelect) return;
+  if (!els.slideSelect || !els.slideForms) return;
+
   els.slideSelect.innerHTML = "";
 
   slides.forEach((slide, index) => {
     const option = document.createElement("option");
-
-    const isComplete = completedSlides.has(index);
-    const check = isComplete ? "✅ " : "";
-
     option.value = index;
-    option.textContent = check + "Slide " + (index + 1) + " - " + (slide.name || slide.title || "Edit");
+    option.textContent =
+      (completedSlides.has(index) ? "✅ " : "") +
+      "Slide " + (index + 1) + " - " + cleanName(slide.name || "Edit");
 
     els.slideSelect.appendChild(option);
   });
+
+  els.slideSelect.value = currentSlideIndex || 0;
+
+  els.slideSelect.onchange = () => {
+    const selectedIndex = Number(els.slideSelect.value);
+    currentSlideIndex = selectedIndex;
+
+    const drawers = els.slideForms.querySelectorAll("details.slide-accordion");
+
+    drawers.forEach((drawer, index) => {
+      drawer.open = index === selectedIndex;
+      drawer.style.display = index === selectedIndex ? "block" : "none";
+    });
+
+    drawSlide(selectedIndex);
+  };
+
+  els.slideSelect.dispatchEvent(new Event("change"));
 }
 
 function showSelectedSlideEditor(index) {
@@ -667,6 +684,7 @@ function buildSlideForms() {
     details.appendChild(body);
     formContainer.appendChild(details);
   });
+  buildSlideDropdown();
 }
 
 function acceptSlidePhoto(photoKey, photo, preview, warning, slideIndex) {
@@ -675,7 +693,9 @@ function acceptSlidePhoto(photoKey, photo, preview, warning, slideIndex) {
   const img = document.createElement("img");
   img.src = photo.url;
   preview.appendChild(img);
-  warning.classList.remove("show");
+    warning.classList.remove("show");
+  completedSlides.add(slideIndex);
+  buildSlideDropdown();
   drawSlide(slideIndex);
 }
 
