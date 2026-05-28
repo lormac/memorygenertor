@@ -1284,7 +1284,7 @@ if (els.musicPlayer.src && els.useDefaultMusic?.checked) {
   stopSlideshow(false);
   playing = true;
   currentSlideIndex = 0;
-  els.playBtn.disabled = true;
+  els.playBtn.disabled = false;
   els.status.textContent = forRecording
     ? "Recording slideshow. Keep this tab open until it finishes."
     : "Playing slideshow preview.";
