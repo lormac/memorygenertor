@@ -1322,13 +1322,82 @@ function scheduleNextSlide() {
 
 }
 
+function playSlideshow(forRecording = false) {
+  if (!slides.length) {
+    els.status.textContent = "Your product did not load yet.";
+    return;
+  }
+
+  stopSlideshow(false);
+
+  playing = true;
+  currentSlideIndex = 0;
+  els.playBtn.disabled = true;
+
+  els.status.textContent = forRecording
+    ? "Recording slideshow. Keep this tab open until it finishes."
+    : "Playing slideshow preview.";
+
+  if (els.musicPlayer && els.musicPlayer.src && els.useDefaultMusic?.checked) {
+    els.musicPlayer.currentTime = 0;
+    els.musicPlayer.play().catch(error => {
+      console.warn("Music could not play:", error);
+    });
+  }
+
+  drawSlide(currentSlideIndex);
+  scheduleNextSlide();
+}
+
+function scheduleNextSlide() {
+  if (!playing) return;
+
+  const seconds = getSlideDuration(currentSlideIndex);
+
+  slideTimer = setTimeout(() => {
+    if (!playing) return;
+
+    currentSlideIndex += 1;
+
+    if (currentSlideIndex >= slides.length) {
+      stopSlideshow(true);
+
+      if (recording && mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+      }
+
+      return;
+    }
+
+    drawSlide(currentSlideIndex);
+    scheduleNextSlide();
+  }, seconds * 1000);
+}
+
+function getSlideDuration(index) {
+  if (
+    theme &&
+    theme.music &&
+    Array.isArray(theme.music.slideDurations) &&
+    theme.music.slideDurations[index]
+  ) {
+    return Number(theme.music.slideDurations[index]);
+  }
+
+  return 5;
+}
 function stopSlideshow(completed) {
   playing = false;
   els.playBtn.disabled = false;
-  if (slideTimer) clearInterval(slideTimer);
+
+  if (slideTimer) clearTimeout(slideTimer);
   slideTimer = null;
-  if (!recording) els.musicPlayer.pause();
-  if (completed && !recording) els.status.textContent = "Slideshow preview finished.";
+
+  if (!recording && els.musicPlayer) els.musicPlayer.pause();
+
+  if (completed && !recording) {
+    els.status.textContent = "Slideshow preview finished.";
+  }
 }
 
 async function exportVideo() {
