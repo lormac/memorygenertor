@@ -459,39 +459,33 @@ async function loadSlidesFromTheme() {
   els.loadStatus.innerHTML =
   "Unlocked: " + escapeHtml(theme.name || "Theme");
 }
+slides.sort(compareSlides);
 
-function resolveThemePath(path) {
-  if (/^https?:\/\//i.test(path)) return path;
-  if (path.startsWith(theme.__folder + "/")) return path;
-  if (path.startsWith("themes/")) return path;
-  return theme.__folder + "/" + path.replace(/^\/+/, "");
+buildSlideForms();
+renderTimeline(0);
+
+if (typeof buildSlideDropdown === "function") {
+  buildSlideDropdown();
 }
 
-function normalizeSlide(slide) {
-  const normalized = {
-    name: slide.name || slide.__fileName || "slide",
-    fileName: slide.__fileName || "",
-    order: slide.order,
-    slideIndex: slide.slideIndex,
-    sortOrder: slide.sortOrder,
-    themeId: slide.themeId || theme.themeId || "",
-    themePath: slide.themePath || theme.themePath || theme.__folder,
-    canvas: slide.canvas || theme.canvas || { width: 1920, height: 1080 },
-    background: slide.background || null,
-    photos: Array.isArray(slide.photos) ? [...slide.photos] : [],
-    text: Array.isArray(slide.text) ? [...slide.text] : [],
-    decor: Array.isArray(slide.decor) ? [...slide.decor] : [],
-    layers: Array.isArray(slide.layers) ? [...slide.layers] : []
-  };
+if (slides.length) {
+  currentSlideIndex = 0;
 
-  for (const layer of normalized.layers) {
-    if (layer.kind === "photo" && !normalized.photos.some(p => sameLayer(p, layer))) normalized.photos.push(layer);
-    if (layer.kind === "decor" && !normalized.decor.some(d => sameLayer(d, layer))) normalized.decor.push(layer);
-    if (layer.kind === "text" && !normalized.text.some(t => sameLayer(t, layer))) normalized.text.push(layer);
+  if (els.slideSelect) {
+    els.slideSelect.value = "0";
   }
 
-  return normalized;
+  if (typeof showSelectedSlideEditor === "function") {
+    showSelectedSlideEditor(0);
+  }
+
+  await drawSlide(0);
 }
+
+els.loadStatus.innerHTML =
+  "Unlocked Product: " + escapeHtml(theme.name || "Theme");
+
+els.status.textContent = "Product loaded.";
 
 function sameLayer(a, b) {
   return (a.name && b.name && a.name === b.name) || (a.path && b.path && a.path === b.path);
