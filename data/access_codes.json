@@ -1,0 +1,21 @@
+{
+  "DINO-BUNDLE": {
+    "status": "active",
+    "themeManifest": "themes/dino_birthday/theme.json",
+    "products": [
+      "slideshow",
+      "invitation"
+    ],
+    "customerEmail": "demo@example.com",
+    "expires": null
+  },
+  "DINO-SHOW": {
+    "status": "active",
+    "themeManifest": "themes/dino_birthday/theme.json",
+    "products": [
+      "slideshow"
+    ],
+    "customerEmail": "demo@example.com",
+    "expires": null
+  }
+}
