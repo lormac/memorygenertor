@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Slideshow Product Generator</title>
+<style>
+:root{
+  --bg:#07131f;
+  --text:#fff;
+  --muted:#b9c7d8;
+  --accent:#ffd94a;
+  --green:#55e47a;
+  --pink:#ff5fa2;
+  --danger:#ff6b6b;
+  --blue:#42c7ff;
+  --radius:22px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Arial,Helvetica,sans-serif;
+  background:
+    radial-gradient(circle at top left,rgba(85,228,122,.25),transparent 34%),
+    radial-gradient(circle at top right,rgba(255,217,74,.20),transparent 32%),
+    radial-gradient(circle at bottom right,rgba(255,95,162,.16),transparent 32%),
+    linear-gradient(135deg,#07131f,#10223d 55%,#07131f);
+  color:var(--text);
+}
+.hidden{display:none!important}
+header{text-align:center;padding:26px 18px 16px}
+h1{margin:0;font-size:clamp(30px,5vw,56px);letter-spacing:-1.5px;line-height:1}
+.subtitle{max-width:980px;margin:12px auto 0;color:var(--muted);line-height:1.5;font-size:17px}
+.wrap{width:min(1500px,calc(100% - 28px));margin:0 auto 42px}
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04));
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:var(--radius);
+  box-shadow:0 20px 70px rgba(0,0,0,.35);
+  overflow:hidden;
+}
+.access-card{max-width:760px;margin:28px auto;padding:24px;text-align:center}
+.access-row{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:18px}
+.app{display:grid;grid-template-columns:500px 1fr;gap:18px;align-items:start}
+.left{padding:20px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+.right{padding:18px}
+.section-title{color:var(--accent);text-transform:uppercase;letter-spacing:1.4px;font-weight:900;font-size:14px;margin:12px 0}
+label{display:block;font-size:14px;color:var(--muted);margin:12px 0 7px;font-weight:800}
+input,textarea,select{
+  width:100%;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(0,0,0,.28);
+  color:white;
+  border-radius:14px;
+  padding:12px 13px;
+  font-size:15px;
+  outline:none;
+}
+textarea{min-height:80px;resize:vertical}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,217,74,.18)}
+button{
+  border:0;
+  border-radius:16px;
+  padding:13px 16px;
+  cursor:pointer;
+  font-weight:900;
+  font-size:15px;
+  color:#07131f;
+  background:linear-gradient(135deg,var(--accent),#ff9f43);
+  box-shadow:0 12px 32px rgba(255,217,74,.22);
+}
+button.secondary{color:white;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);box-shadow:none}
+button.good{background:linear-gradient(135deg,var(--green),#b8ff69)}
+button.danger{color:white;background:linear-gradient(135deg,var(--danger),#d63031)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.button-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.stage-shell{
+  width:100%;
+  aspect-ratio:16/9;
+  background:#07131f;
+  border-radius:22px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),0 30px 80px rgba(0,0,0,.42);
+}
+canvas{width:100%;height:100%;display:block;background:#10223d}
+.status{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:14px;
+  background:rgba(255,255,255,.08);
+  color:var(--muted);
+  line-height:1.45;
+  font-size:14px;
+}
+.timeline{margin-top:14px;display:grid;grid-template-columns:repeat(10,1fr);gap:7px}
+.dot{height:8px;border-radius:99px;background:rgba(255,255,255,.14);cursor:pointer}
+.dot.active{background:linear-gradient(90deg,var(--accent),var(--pink))}
+.slide-accordion{border:1px solid rgba(255,255,255,.12);border-radius:18px;margin:12px 0;overflow:hidden;background:rgba(0,0,0,.18)}
+.slide-accordion summary{
+  cursor:pointer;
+  list-style:none;
+  padding:14px;
+  font-weight:900;
+  color:#ffffff;
+  background:rgba(255,255,255,.08);
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+}
+.slide-accordion summary::-webkit-details-marker{display:none}
+.slide-accordion summary::after{content:"Open";color:#ffd94a;font-size:12px;text-transform:uppercase;letter-spacing:1px}
+.slide-accordion[open] summary::after{content:"Close"}
+.slide-accordion-body{padding:14px}
+.slide-pill{display:inline-block;padding:5px 8px;border-radius:999px;background:rgba(85,228,122,.18);color:#b8ffca;font-size:12px;margin-left:6px}
+.slide-empty{color:#b7c7d8;font-size:13px;line-height:1.45}
+.photo-slot{margin:12px 0;padding:12px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10)}
+.photo-row{display:grid;grid-template-columns:82px 1fr;gap:12px;align-items:center}
+.photo-preview{
+  width:82px;height:82px;border-radius:14px;overflow:hidden;
+  background:linear-gradient(135deg,#87f06d,#3fb7ff);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(0,0,0,.55);font-weight:900;font-size:12px;text-align:center;
+}
+.photo-preview img{width:100%;height:100%;object-fit:cover;display:block}
+.orientation-badge{display:inline-block;margin:6px 0 8px;padding:6px 9px;border-radius:999px;background:rgba(66,199,255,.15);border:1px solid rgba(66,199,255,.35);color:#bfeeff;font-size:12px;font-weight:900}
+.warning{display:none;margin-top:10px;padding:10px;border-radius:14px;background:rgba(255,217,74,.13);border:1px solid rgba(255,217,74,.35);color:#ffeaa0;font-size:13px;line-height:1.4}
+.warning.show{display:block}
+.warning-actions{display:flex;gap:8px;margin-top:10px}
+.warning-actions button{font-size:12px;padding:9px 10px;border-radius:12px}
+.field-meta{color:var(--muted);font-size:12px;margin-top:4px}
+.download-link{display:none;margin-top:12px;text-align:center;text-decoration:none;color:#07131f;background:linear-gradient(135deg,var(--green),#b8ff69);padding:14px 16px;border-radius:16px;font-weight:900}
+.download-link.show{display:block}
+.notice{color:var(--muted);font-size:13px;line-height:1.45;margin-top:12px}
+code{color:#ffef9b}
+@media(max-width:980px){.app{grid-template-columns:1fr}.left{position:static;max-height:none}.access-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="pageTitle">Slideshow Generator</h1>
+  <p class="subtitle" id="pageSubtitle">Enter your access code to unlock your purchased product.</p>
+</header>
+
+<main class="wrap">
+  <section id="accessScreen" class="card access-card">
+    <h2>Enter Access Code</h2>
+    <p class="subtitle">Your code was included with your purchase.</p>
+    <div class="access-row">
+      <input id="accessCodeInput" placeholder="Enter your code" />
+      <button id="unlockBtn">Unlock</button>
+    </div>
+    <div id="accessStatus" class="status">Demo code in the included sample file: DINO-BUNDLE</div>
+  </section>
+
+  <section id="appScreen" class="app hidden">
+    <aside class="card left">
+      <div class="section-title">Your Product</div>
+      <div id="loadStatus" class="status">Loading...</div>
+
+      <div class="section-title">Fill In Each Slide</div>
+      <div id="slideForms"><div class="status">Loading form...</div></div>
+
+      <div class="section-title">Music And Export</div>
+      <label for="musicInput">Optional Music</label>
+      <input id="musicInput" type="file" accept="audio/*" />
+
+      <label for="secondsPerSlide">Seconds Per Slide</label>
+      <select id="secondsPerSlide">
+        <option value="3">3 seconds</option>
+        <option value="4" selected>4 seconds</option>
+        <option value="5">5 seconds</option>
+        <option value="6">6 seconds</option>
+      </select>
+
+      <label for="exportQuality">Export Quality</label>
+      <select id="exportQuality">
+        <option value="720" selected>HD 1280 by 720</option>
+        <option value="1080">Full HD 1920 by 1080</option>
+      </select>
+
+      <div class="button-grid">
+        <button id="generateBtn">Generate Preview</button>
+        <button id="playBtn" class="secondary">Play</button>
+        <button id="stopBtn" class="secondary">Stop</button>
+        <button id="recordBtn">Export Video</button>
+      </div>
+
+      <a id="videoDownloadLink" class="download-link" download="slideshow.webm">Download Slideshow Video</a>
+      <p class="notice">This browser version exports WebM. Chrome or Edge works best. Production MP4 export should be rendered server side.</p>
+    </aside>
+
+    <section class="card right">
+      <div class="stage-shell"><canvas id="stage" width="1280" height="720"></canvas></div>
+      <div id="timeline" class="timeline"></div>
+      <div id="status" class="status">Enter your code to begin.</div>
+    </section>
+  </section>
+</main>
+
+<audio id="musicPlayer" crossorigin="anonymous"></audio>
+
+<script>
+/*
+  LAUNCH STRUCTURE
+
+  index.html
+  data/access_codes.json
+  themes/dino_birthday/theme.json
+  themes/dino_birthday/layouts/01_dino_intro.json
+  themes/dino_birthday/backgrounds/your PNG files
+
+  The HTML does NOT hardcode dino layouts.
+  Access code chooses the theme manifest.
+  Theme manifest chooses the JSON layouts.
+*/
+
+const ACCESS_CODES_URL = "data/access_codes.json";
+
+const FALLBACK_TEXT_STYLES = {
+  default: {
+    fontFamily: "Arial Black, Arial, sans-serif",
+    fontWeight: "900",
+    color: "#ffffff",
+    stroke: "#254112",
+    strokeWidthPercent: 0.6,
+    align: "center"
+  }
+};
+
+const els = {
+  pageTitle: document.getElementById("pageTitle"),
+  pageSubtitle: document.getElementById("pageSubtitle"),
+  accessScreen: document.getElementById("accessScreen"),
+  appScreen: document.getElementById("appScreen"),
+  accessCodeInput: document.getElementById("accessCodeInput"),
+  unlockBtn: document.getElementById("unlockBtn"),
+  accessStatus: document.getElementById("accessStatus"),
+  loadStatus: document.getElementById("loadStatus"),
+  slideForms: document.getElementById("slideForms"),
+  musicInput: document.getElementById("musicInput"),
+  secondsPerSlide: document.getElementById("secondsPerSlide"),
+  exportQuality: document.getElementById("exportQuality"),
+  generateBtn: document.getElementById("generateBtn"),
+  playBtn: document.getElementById("playBtn"),
+  stopBtn: document.getElementById("stopBtn"),
+  recordBtn: document.getElementById("recordBtn"),
+  videoDownloadLink: document.getElementById("videoDownloadLink"),
+  stage: document.getElementById("stage"),
+  timeline: document.getElementById("timeline"),
+  status: document.getElementById("status"),
+  musicPlayer: document.getElementById("musicPlayer")
+};
+
+const ctx = els.stage.getContext("2d");
+
+let accessRecord = null;
+let theme = null;
+let slides = [];
+let imageCache = {};
+let textStyles = FALLBACK_TEXT_STYLES;
+let textValues = {};
+let slidePhotos = {};
+let currentSlideIndex = 0;
+let playing = false;
+let recording = false;
+let slideTimer = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+
+els.unlockBtn.addEventListener("click", unlockCode);
+els.accessCodeInput.addEventListener("keydown", e => { if (e.key === "Enter") unlockCode(); });
+els.musicInput.addEventListener("change", handleMusicUpload);
+els.generateBtn.addEventListener("click", generatePreview);
+els.playBtn.addEventListener("click", () => playSlideshow(false));
+els.stopBtn.addEventListener("click", () => stopSlideshow(false));
+els.recordBtn.addEventListener("click", exportVideo);
+els.exportQuality.addEventListener("change", generatePreview);
+
+drawFallbackBackground(ctx, els.stage.width, els.stage.height);
+
+async function unlockCode() {
+  const code = els.accessCodeInput.value.trim().toUpperCase();
+  if (!code) {
+    els.accessStatus.textContent = "Please enter your access code.";
+    return;
+  }
+
+  try {
+    const accessRes = await fetch(ACCESS_CODES_URL, { cache: "no-store" });
+    if (!accessRes.ok) throw new Error("Could not load access code file.");
+    const accessCodes = await accessRes.json();
+
+    accessRecord = accessCodes[code];
+
+    if (!accessRecord) {
+      els.accessStatus.textContent = "That code was not found. Please check your purchase email and try again.";
+      return;
+    }
+
+    if (accessRecord.status && accessRecord.status !== "active") {
+      els.accessStatus.textContent = "This code is not active.";
+      return;
+    }
+
+    await loadTheme(accessRecord.themeManifest);
+	await loadThemeFonts();
+
+	els.accessScreen.classList.add("hidden");
+	els.appScreen.classList.remove("hidden");
+
+	els.pageTitle.textContent = theme.name || "Slideshow Generator";
+	els.pageSubtitle.textContent = theme.customerSubtitle || "Fill in your slides, upload photos, and export your finished slideshow.";
+
+	await loadSlidesFromTheme();
+
+  } catch (error) {
+    console.error(error);
+    els.accessStatus.textContent = "Could not unlock this product. " + error.message;
+  }
+}
+
+async function loadTheme(themeManifestPath) {
+  const res = await fetch(themeManifestPath, { cache: "no-store" });
+  if (!res.ok) throw new Error("Could not load theme manifest: " + themeManifestPath);
+
+  theme = await res.json();
+  theme.__manifestPath = themeManifestPath;
+  theme.__folder = themeManifestPath.split("/").slice(0, -1).join("/");
+
+  textStyles = { ...FALLBACK_TEXT_STYLES, ...(theme.textStyles || {}) };
+}
+
+async function loadThemeFonts() {
+  if (!theme || !Array.isArray(theme.fonts)) {
+    console.warn("No theme fonts listed.");
+    return;
+  }
+
+  if (!("FontFace" in window)) {
+    console.warn("FontFace API is not supported in this browser.");
+    return;
+  }
+
+  for (const font of theme.fonts) {
+    try {
+      const fontFamily = font.fontFamily;
+      const fontWeight = String(font.fontWeight || "400");
+      const fontStyle = font.fontStyle || "normal";
+      const fontPath = resolveThemePath(font.path);
+
+      console.log("Loading theme font:", fontFamily, fontPath);
+
+      const fontFace = new FontFace(
+        fontFamily,
+        `url("${fontPath}") format("woff2")`,
+        {
+          weight: fontWeight,
+          style: fontStyle
+        }
+      );
+
+      const loadedFont = await fontFace.load();
+      document.fonts.add(loadedFont);
+
+      await document.fonts.load(`${fontWeight} 120px "${fontFamily}"`);
+
+      console.log("Loaded theme font:", fontFamily);
+    } catch (error) {
+      console.warn("Could not load theme font:", font, error);
+    }
+  }
+
+  if (document.fonts && document.fonts.ready) {
+    await document.fonts.ready;
+  }
+}
+
+async function loadSlidesFromTheme() {
+  slides = [];
+  imageCache = {};
+  textValues = {};
+  slidePhotos = {};
+
+  const product = (accessRecord.products || []).includes("slideshow") ? "slideshow" : null;
+  if (!product) {
+    els.status.textContent = "This code does not include a slideshow.";
+    return;
+  }
+
+  const slideshow = theme.products && theme.products.slideshow;
+  if (!slideshow || !Array.isArray(slideshow.layouts)) {
+    els.status.textContent = "This theme has no slideshow layouts configured.";
+    return;
+  }
+
+  const report = [];
+
+  for (const layoutPath of slideshow.layouts) {
+    const fullPath = resolveThemePath(layoutPath);
+    try {
+      const res = await fetch(fullPath, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const json = await res.json();
+      json.__fileName = fullPath.split("/").pop();
+      slides.push(normalizeSlide(json));
+      report.push("Loaded " + fullPath);
+    } catch (error) {
+      report.push("FAILED " + fullPath + " because " + error.message);
+      console.error("Could not load layout", fullPath, error);
+    }
+  }
+
+  slides.sort(compareSlides);
+  buildSlideForms();
+  renderTimeline(0);
+
+  if (slides.length) {
+    currentSlideIndex = 0;
+    await drawSlide(0);
+  }
+
+  els.loadStatus.innerHTML =
+    "Unlocked: " + escapeHtml(theme.name || "Theme") +
+    "<br>Loaded " + slides.length + " slide(s)." +
+    "<br>" + report.map(escapeHtml).join("<br>");
+
+  els.status.textContent = "Product loaded.";
+}
+
+function resolveThemePath(path) {
+  if (/^https?:\/\//i.test(path)) return path;
+  if (path.startsWith(theme.__folder + "/")) return path;
+  if (path.startsWith("themes/")) return path;
+  return theme.__folder + "/" + path.replace(/^\/+/, "");
+}
+
+function normalizeSlide(slide) {
+  const normalized = {
+    name: slide.name || slide.__fileName || "slide",
+    fileName: slide.__fileName || "",
+    order: slide.order,
+    slideIndex: slide.slideIndex,
+    sortOrder: slide.sortOrder,
+    themeId: slide.themeId || theme.themeId || "",
+    themePath: slide.themePath || theme.themePath || theme.__folder,
+    canvas: slide.canvas || theme.canvas || { width: 1920, height: 1080 },
+    background: slide.background || null,
+    photos: Array.isArray(slide.photos) ? [...slide.photos] : [],
+    text: Array.isArray(slide.text) ? [...slide.text] : [],
+    decor: Array.isArray(slide.decor) ? [...slide.decor] : [],
+    layers: Array.isArray(slide.layers) ? [...slide.layers] : []
+  };
+
+  for (const layer of normalized.layers) {
+    if (layer.kind === "photo" && !normalized.photos.some(p => sameLayer(p, layer))) normalized.photos.push(layer);
+    if (layer.kind === "decor" && !normalized.decor.some(d => sameLayer(d, layer))) normalized.decor.push(layer);
+    if (layer.kind === "text" && !normalized.text.some(t => sameLayer(t, layer))) normalized.text.push(layer);
+  }
+
+  return normalized;
+}
+
+function sameLayer(a, b) {
+  return (a.name && b.name && a.name === b.name) || (a.path && b.path && a.path === b.path);
+}
+
+function compareSlides(a, b) {
+  const ai = getSortValue(a);
+  const bi = getSortValue(b);
+  if (ai !== bi) return ai - bi;
+  return (a.fileName || a.name || "").localeCompare((b.fileName || b.name || ""), undefined, { numeric: true });
+}
+
+function getSortValue(slide) {
+  if (typeof slide.order === "number") return slide.order;
+  if (typeof slide.slideIndex === "number") return slide.slideIndex;
+  if (typeof slide.sortOrder === "number") return slide.sortOrder;
+
+  const haystack = ((slide.fileName || "") + " " + (slide.name || "")).toLowerCase();
+  if (haystack.includes("intro") || haystack.includes("cover") || haystack.includes("opening")) return 0;
+
+  const match = haystack.match(/(?:^|[^0-9])([0-9]{1,3})(?:[^0-9]|$)/);
+  if (match) return Number(match[1]);
+
+  return 9999;
+}
+
+function buildSlideForms() {
+  els.slideForms.innerHTML = "";
+
+  if (!slides.length) {
+    els.slideForms.innerHTML = '<div class="status">No slides loaded.</div>';
+    return;
+  }
+
+  slides.forEach((slide, slideIndex) => {
+    const textLayers = [...(slide.text || [])].sort((a, b) => (a.z || 0) - (b.z || 0));
+    const photoLayers = [...(slide.photos || [])].sort((a, b) => (a.z || 0) - (b.z || 0));
+
+    const details = document.createElement("details");
+    details.className = "slide-accordion";
+    if (slideIndex === 0) details.open = true;
+
+    const summary = document.createElement("summary");
+    summary.innerHTML =
+      "<span>Slide " + (slideIndex + 1) + "  " + escapeHtml(cleanName(slide.name)) +
+      '<span class="slide-pill">' + textLayers.length + " text</span>" +
+      '<span class="slide-pill">' + photoLayers.length + " photo</span></span>";
+    details.appendChild(summary);
+
+    summary.addEventListener("click", () => setTimeout(() => drawSlide(slideIndex), 0));
+
+    const body = document.createElement("div");
+    body.className = "slide-accordion-body";
+
+    if (!textLayers.length && !photoLayers.length) {
+      const empty = document.createElement("div");
+      empty.className = "slide-empty";
+      empty.textContent = "This slide has no editable text or photo upload.";
+      body.appendChild(empty);
+    }
+
+    textLayers.forEach((layer, textIndex) => {
+      const key = makeTextKey(slideIndex, layer, textIndex);
+
+      const label = document.createElement("label");
+      label.htmlFor = key;
+      label.textContent = friendlyFieldName(layer.field || layer.name || ("Text " + (textIndex + 1)));
+
+      const input = document.createElement("input");
+      input.id = key;
+      input.value = layer.sampleText || defaultValueForField(layer.field) || "";
+      textValues[key] = input.value;
+
+      input.addEventListener("focus", () => drawSlide(slideIndex));
+      input.addEventListener("input", () => {
+        textValues[key] = input.value;
+        drawSlide(slideIndex);
+      });
+
+      const meta = document.createElement("div");
+      meta.className = "field-meta";
+      meta.textContent = "Text style: " + (layer.style || "default");
+
+      body.appendChild(label);
+      body.appendChild(input);
+      body.appendChild(meta);
+    });
+
+    photoLayers.forEach((layer, photoSlotIndex) => {
+      const photoKey = makePhotoKey(slideIndex, layer, photoSlotIndex);
+      const slotOrientation = getSlotOrientation(layer, slide);
+
+      const slot = document.createElement("div");
+      slot.className = "photo-slot";
+
+      const label = document.createElement("label");
+      label.textContent = "Upload " + capitalize(slotOrientation) + " Photo";
+
+      const badge = document.createElement("div");
+      badge.className = "orientation-badge";
+      badge.textContent = "This opening works best with a " + slotOrientation + " photo";
+
+      const row = document.createElement("div");
+      row.className = "photo-row";
+
+      const preview = document.createElement("div");
+      preview.className = "photo-preview";
+      preview.id = photoKey + "_preview";
+      preview.textContent = capitalize(slotOrientation);
+
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "image/*";
+
+      const warning = document.createElement("div");
+      warning.className = "warning";
+      warning.id = photoKey + "_warning";
+
+      fileInput.addEventListener("focus", () => drawSlide(slideIndex));
+
+      fileInput.addEventListener("change", async () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+
+        const photo = await loadPhotoFromFile(file);
+        const photoOrientation = getPhotoOrientation(photo.img);
+
+        if (photoOrientation !== slotOrientation && photoOrientation !== "square" && slotOrientation !== "square") {
+          warning.innerHTML =
+            "This photo is " + photoOrientation + ", but this opening works best with a " + slotOrientation + " photo. " +
+            "You can choose a different photo or continue anyway. You can change it later if it does not fit right." +
+            '<div class="warning-actions">' +
+            '<button type="button" class="secondary" data-action="change">Change Photo</button>' +
+            '<button type="button" class="good" data-action="continue">Go Ahead Anyway</button>' +
+            "</div>";
+
+          warning.classList.add("show");
+
+          warning.querySelector('[data-action="change"]').addEventListener("click", () => {
+            fileInput.value = "";
+            warning.classList.remove("show");
+          });
+
+          warning.querySelector('[data-action="continue"]').addEventListener("click", () => {
+            acceptSlidePhoto(photoKey, photo, preview, warning, slideIndex);
+          });
+
+          return;
+        }
+
+        acceptSlidePhoto(photoKey, photo, preview, warning, slideIndex);
+      });
+
+      const note = document.createElement("div");
+      note.className = "field-meta";
+      note.textContent = "Choose another file anytime to replace this slide photo.";
+
+      row.appendChild(preview);
+      row.appendChild(fileInput);
+
+      slot.appendChild(label);
+      slot.appendChild(badge);
+      slot.appendChild(row);
+      slot.appendChild(warning);
+      slot.appendChild(note);
+      body.appendChild(slot);
+    });
+
+    details.appendChild(body);
+    els.slideForms.appendChild(details);
+  });
+}
+
+function acceptSlidePhoto(photoKey, photo, preview, warning, slideIndex) {
+  slidePhotos[photoKey] = photo;
+  preview.innerHTML = "";
+  const img = document.createElement("img");
+  img.src = photo.url;
+  preview.appendChild(img);
+  warning.classList.remove("show");
+  drawSlide(slideIndex);
+}
+
+
+function getSlotOrientation(layer, slide) {
+  const canvasW = Number(slide?.canvas?.width || theme?.canvas?.width || 1920);
+  const canvasH = Number(slide?.canvas?.height || theme?.canvas?.height || 1080);
+
+  const percentW = Number(layer.w || 0);
+  const percentH = Number(layer.h || 0);
+
+  if (!percentW || !percentH) return "landscape";
+
+  const pixelW = (percentW / 100) * canvasW;
+  const pixelH = (percentH / 100) * canvasH;
+
+  const ratio = pixelW / pixelH;
+
+  if (ratio > 1.08) return "landscape";
+  if (ratio < 0.92) return "portrait";
+  return "square";
+}
+
+
+
+function getPhotoOrientation(img) {
+  const w = img.naturalWidth || img.width;
+  const h = img.naturalHeight || img.height;
+  const ratio = w / h;
+  if (ratio > 1.08) return "landscape";
+  if (ratio < 0.92) return "portrait";
+  return "square";
+}
+
+function loadPhotoFromFile(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve({ img, url: img.src, name: file.name });
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function makeTextKey(slideIndex, layer, textIndex) {
+  return "slide_" + slideIndex + "_text_" + textIndex + "_" + slug(layer.field || layer.name || "text");
+}
+
+function makePhotoKey(slideIndex, layer, photoSlotIndex) {
+  return "slide_" + slideIndex + "_photo_" + photoSlotIndex + "_" + slug(layer.field || layer.name || "photo");
+}
+
+function defaultValueForField(field) {
+  const f = String(field || "").toLowerCase();
+  if (f.includes("child") || f.includes("name")) return "Hudson";
+  if (f.includes("age") || f.includes("number")) return "5";
+  if (f.includes("headline")) return "Happy Birthday";
+  if (f.includes("message")) return "A roaring good time";
+  return "";
+}
+
+function slug(value) {
+  return String(value || "field").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+}
+
+function cleanName(value) {
+  return String(value || "").replace(/_/g, " ");
+}
+
+function friendlyFieldName(value) {
+  return String(value || "Text").replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function capitalize(value) {
+  return String(value || "").charAt(0).toUpperCase() + String(value || "").slice(1);
+}
+
+function escapeHtml(value) {
+  return String(value || "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[ch]));
+}
+
+function handleMusicUpload() {
+  const file = els.musicInput.files && els.musicInput.files[0];
+  if (!file) return;
+  els.musicPlayer.src = URL.createObjectURL(file);
+  els.musicPlayer.loop = true;
+}
+
+function setCanvasQuality() {
+  // Force all preview and export rendering to true Full HD.
+  // This prevents the exported video from being recorded from a soft 720p canvas.
+  els.stage.width = 1920;
+  els.stage.height = 1080;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+}
+
+async function generatePreview() {
+  if (!slides.length) {
+    els.status.textContent = "Your product did not load yet.";
+    return;
+  }
+
+  setCanvasQuality();
+  currentSlideIndex = 0;
+  renderTimeline(0);
+  await drawSlide(0);
+  els.videoDownloadLink.classList.remove("show");
+  els.status.textContent = "Preview generated.";
+}
+
+async function drawSlide(index) {
+  if (!slides.length) {
+    drawFallbackBackground(ctx, els.stage.width, els.stage.height);
+    return;
+  }
+
+  if (index < 0) index = 0;
+  if (index >= slides.length) index = slides.length - 1;
+
+  currentSlideIndex = index;
+  const slide = slides[index];
+  const w = els.stage.width;
+  const h = els.stage.height;
+
+  drawFallbackBackground(ctx, w, h);
+
+  const mode = theme.photoLayerMode || "backgroundOverlay";
+
+  if (mode === "normalSandwich") {
+    await drawBackground(slide, w, h);
+    await drawPhotos(slide, index, w, h);
+  } else {
+    await drawPhotos(slide, index, w, h);
+    await drawBackground(slide, w, h);
+  }
+
+  await drawDecor(slide, w, h);
+  await drawTexts(slide, index, w, h);
+  renderTimeline(index);
+}
+
+async function drawBackground(slide, w, h) {
+  if (!slide.background || !slide.background.path) return;
+
+  const bg = await loadImage(slide.background.path);
+  if (bg.ok) {
+    drawLayerImage(ctx, bg.img, { x: 0, y: 0, w: 100, h: 100 }, w, h);
+  } else {
+    drawMissingNotice(ctx, w, h, "Missing background", slide.background.path);
+  }
+}
+
+async function drawDecor(slide, w, h) {
+  const decor = [...(slide.decor || [])].sort((a, b) => (a.z || 0) - (b.z || 0));
+
+  for (const layer of decor) {
+    if (!layer.path) continue;
+    const img = await loadImage(layer.path);
+    if (img.ok) drawLayerImage(ctx, img.img, layer, w, h);
+    else drawMissingNotice(ctx, w, h, "Missing decor", layer.path);
+  }
+}
+
+async function drawPhotos(slide, slideIndex, w, h) {
+  const photoLayers = [...(slide.photos || [])].sort((a, b) => (a.z || 0) - (b.z || 0));
+
+  for (let i = 0; i < photoLayers.length; i++) {
+    const layer = photoLayers[i];
+    const key = makePhotoKey(slideIndex, layer, i);
+    drawPhotoLayer(ctx, layer, slidePhotos[key], w, h);
+  }
+}
+
+function drawLayerImage(context, img, layer, canvasW, canvasH) {
+  const x = (Number(layer.x ?? 0) / 100) * canvasW;
+  const y = (Number(layer.y ?? 0) / 100) * canvasH;
+  const w = (Number(layer.w ?? 100) / 100) * canvasW;
+  const h = (Number(layer.h ?? 100) / 100) * canvasH;
+  context.drawImage(img, x, y, w, h);
+}
+
+function drawPhotoLayer(context, layer, photo, canvasW, canvasH) {
+  const x = (Number(layer.x ?? 0) / 100) * canvasW;
+  const y = (Number(layer.y ?? 0) / 100) * canvasH;
+  const w = (Number(layer.w ?? 100) / 100) * canvasW;
+  const h = (Number(layer.h ?? 100) / 100) * canvasH;
+
+  context.save();
+  context.beginPath();
+  context.rect(x, y, w, h);
+  context.clip();
+
+  if (photo && photo.img) {
+    drawImageCover(context, photo.img, x, y, w, h);
+  } else {
+    const grd = context.createLinearGradient(x, y, x + w, y + h);
+    grd.addColorStop(0, "#87f06d");
+    grd.addColorStop(1, "#3fb7ff");
+    context.fillStyle = grd;
+    context.fillRect(x, y, w, h);
+    context.fillStyle = "rgba(0,0,0,.5)";
+    context.font = Math.round(canvasW * 0.026) + "px Arial";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillText("Upload Photo", x + w / 2, y + h / 2);
+  }
+
+  context.restore();
+}
+
+function drawImageCover(context, img, x, y, w, h) {
+  const iw = img.naturalWidth || img.width;
+  const ih = img.naturalHeight || img.height;
+  const scale = Math.max(w / iw, h / ih);
+  const nw = iw * scale;
+  const nh = ih * scale;
+  const nx = x + (w - nw) / 2;
+  const ny = y + (h - nh) / 2;
+  context.drawImage(img, nx, ny, nw, nh);
+}
+
+
+
+
+
+async function drawTexts(slide, slideIndex, w, h) {
+  const textLayers = [...(slide.text || [])].sort((a, b) => (a.z || 0) - (b.z || 0));
+
+  for (let i = 0; i < textLayers.length; i++) {
+    await drawTextLayer(ctx, textLayers[i], slideIndex, i, w, h);
+  }
+}
+
+async function drawTextLayer(context, layer, slideIndex, textIndex, canvasW, canvasH) {
+  const key = makeTextKey(slideIndex, layer, textIndex);
+  const value = textValues[key] ?? layer.sampleText ?? "";
+
+  const x = (Number(layer.x ?? 0) / 100) * canvasW;
+  const y = (Number(layer.y ?? 0) / 100) * canvasH;
+  const boxW = (Number(layer.w ?? 20) / 100) * canvasW;
+  const boxH = (Number(layer.h ?? 10) / 100) * canvasH;
+
+  const style = textStyles[layer.style] || textStyles.default || FALLBACK_TEXT_STYLES.default;
+
+  const fontFamily = style.fontFamily || "Arial Black, Arial, sans-serif";
+  const fontWeight = style.fontWeight || "900";
+
+  let fontSize = Math.max(12, boxH * (style.fontScale || 0.82));
+
+  const letterSpacing = Number(style.letterSpacingPx || 0) * (canvasW / 1920);
+
+  context.save();
+
+  context.textAlign = style.align || "center";
+  context.textBaseline = "middle";
+  context.font = `${fontWeight} ${Math.round(fontSize)}px "${fontFamily}"`;
+
+  while (measureTextWithSpacing(context, value, letterSpacing) > boxW * 0.96 && fontSize > 12) {
+    fontSize -= 2;
+    context.font = `${fontWeight} ${Math.round(fontSize)}px "${fontFamily}"`;
+  }
+
+  const textX = x + boxW / 2;
+  const textY = y + boxH / 2;
+
+  const shadowOpacity = Number(style.shadowOpacity || 0) / 100;
+  if (shadowOpacity > 0) {
+    context.shadowColor = hexToRgba(style.shadowColor || "#000000", shadowOpacity);
+    context.shadowBlur = Number(style.shadowBlur || 0) * (canvasW / 1920);
+    context.shadowOffsetX = Number(style.shadowX || 0) * (canvasW / 1920);
+    context.shadowOffsetY = Number(style.shadowY || 0) * (canvasW / 1920);
+  }
+
+  const outerStrokePx = Number(style.outerStrokePx || 0) * (canvasW / 1920);
+  const innerStrokePx = Number(style.strokePx || 0) * (canvasW / 1920);
+
+
+
+const scale = canvasW / 1920;
+
+const layers3d = Number(style.layers3d || 0);
+const depthX = Number(style.depthX || 0) * scale;
+const depthY = Number(style.depthY || 0) * scale;
+const sideColor = style.sideColor || "#ffffff";
+const sideFade = Number(style.sideFade || 0) / 100;
+
+const glowSize = Number(style.glowSize || 0) * scale;
+const glowOpacity = Number(style.glowOpacity || 0) / 100;
+const glowColor = style.glowColor || "#ffffff";
+
+if (glowSize > 0 && glowOpacity > 0) {
+  context.save();
+  context.shadowColor = hexToRgba(glowColor, glowOpacity);
+  context.shadowBlur = glowSize;
+  context.shadowOffsetX = 0;
+  context.shadowOffsetY = 0;
+  context.fillStyle = hexToRgba(glowColor, glowOpacity);
+  fillTextWithSpacing(context, value, textX, textY, letterSpacing);
+  context.restore();
+}
+
+if (layers3d > 0 && (depthX !== 0 || depthY !== 0)) {
+  context.save();
+
+  for (let i = layers3d; i >= 1; i--) {
+    const fadeAmount = sideFade > 0 ? 1 - (i / layers3d) * sideFade : 1;
+    context.globalAlpha = Math.max(0.05, fadeAmount);
+    context.fillStyle = sideColor;
+
+    const offsetX = depthX * i;
+    const offsetY = depthY * i;
+
+    fillTextWithSpacing(context, value, textX + offsetX, textY + offsetY, letterSpacing);
+  }
+
+  context.globalAlpha = 1;
+  context.restore();
+}
+
+if (outerStrokePx > 0) {
+  context.lineWidth = outerStrokePx;
+  context.strokeStyle = style.outerStrokeColor || "#ffffff";
+  strokeTextWithSpacing(context, value, textX, textY, letterSpacing);
+}
+
+if (innerStrokePx > 0) {
+  context.lineWidth = innerStrokePx;
+  context.strokeStyle = style.strokeColor || style.stroke || "#000000";
+  strokeTextWithSpacing(context, value, textX, textY, letterSpacing);
+}
+
+
+
+
+  context.shadowColor = "transparent";
+  context.shadowBlur = 0;
+  context.shadowOffsetX = 0;
+  context.shadowOffsetY = 0;
+
+  if (style.useTexture && style.textureAsset) {
+    const texture = await loadImage(style.textureAsset);
+
+    if (texture.ok) {
+      const patternCanvas = document.createElement("canvas");
+      const patternSize = Math.max(80, Math.round(fontSize * Number(style.textureSizePercent || 100) / 100));
+
+      patternCanvas.width = patternSize;
+      patternCanvas.height = patternSize;
+
+      const pctx = patternCanvas.getContext("2d");
+      pctx.imageSmoothingEnabled = true;
+      pctx.imageSmoothingQuality = "high";
+      pctx.drawImage(texture.img, 0, 0, patternSize, patternSize);
+
+      const pattern = context.createPattern(patternCanvas, "repeat");
+
+      context.fillStyle = pattern || style.faceColor || style.color || "#ffffff";
+    } else {
+      context.fillStyle = style.faceColor || style.color || "#ffffff";
+    }
+  } else {
+    context.fillStyle = style.faceColor || style.color || "#ffffff";
+  }
+
+  fillTextWithSpacing(context, value, textX, textY, letterSpacing);
+
+  const highlightStrength = Number(style.highlightStrength || 0);
+  if (highlightStrength > 0) {
+    context.globalAlpha = Math.min(0.35, highlightStrength / 100);
+    context.fillStyle = "#ffffff";
+    context.translate(0, -fontSize * 0.12);
+    fillTextWithSpacing(context, value, textX, textY, letterSpacing);
+    context.globalAlpha = 1;
+  }
+
+  context.restore();
+}
+
+function measureTextWithSpacing(context, text, letterSpacing) {
+  if (!letterSpacing) return context.measureText(text).width;
+
+  let width = 0;
+  for (let i = 0; i < text.length; i++) {
+    width += context.measureText(text[i]).width;
+    if (i < text.length - 1) width += letterSpacing;
+  }
+  return width;
+}
+
+function fillTextWithSpacing(context, text, x, y, letterSpacing) {
+  if (!letterSpacing) {
+    context.fillText(text, x, y);
+    return;
+  }
+
+  const totalWidth = measureTextWithSpacing(context, text, letterSpacing);
+  let currentX = x - totalWidth / 2;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    context.fillText(char, currentX, y);
+    currentX += context.measureText(char).width + letterSpacing;
+  }
+}
+
+function strokeTextWithSpacing(context, text, x, y, letterSpacing) {
+  if (!letterSpacing) {
+    context.strokeText(text, x, y);
+    return;
+  }
+
+  const totalWidth = measureTextWithSpacing(context, text, letterSpacing);
+  let currentX = x - totalWidth / 2;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    context.strokeText(char, currentX, y);
+    currentX += context.measureText(char).width + letterSpacing;
+  }
+}
+
+function hexToRgba(hex, alpha) {
+  let value = String(hex || "#000000").replace("#", "");
+
+  if (value.length === 3) {
+    value = value.split("").map(ch => ch + ch).join("");
+  }
+
+  const r = parseInt(value.substring(0, 2), 16);
+  const g = parseInt(value.substring(2, 4), 16);
+  const b = parseInt(value.substring(4, 6), 16);
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+
+
+
+
+function loadImage(src) {
+  const fixed = resolveThemePath(src);
+
+  if (imageCache[fixed]) return imageCache[fixed];
+
+  imageCache[fixed] = new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve({ img, ok: true, src: fixed });
+    img.onerror = () => resolve({ img: null, ok: false, src: fixed });
+    img.src = fixed;
+  });
+
+  return imageCache[fixed];
+}
+
+function drawFallbackBackground(context, w, h) {
+  const grd = context.createLinearGradient(0, 0, w, h);
+  grd.addColorStop(0, "#48d36d");
+  grd.addColorStop(0.5, "#ffd94a");
+  grd.addColorStop(1, "#3fb7ff");
+  context.fillStyle = grd;
+  context.fillRect(0, 0, w, h);
+}
+
+function drawMissingNotice(context, w, h, title, path) {
+  context.save();
+  context.fillStyle = "rgba(0,0,0,.48)";
+  context.fillRect(w * 0.08, h * 0.1, w * 0.84, h * 0.18);
+  context.strokeStyle = "#ffef58";
+  context.lineWidth = 3;
+  context.strokeRect(w * 0.08, h * 0.1, w * 0.84, h * 0.18);
+  context.fillStyle = "#fff";
+  context.textAlign = "center";
+  context.font = "900 " + Math.round(w * 0.025) + "px Arial";
+  context.fillText(title, w / 2, h * 0.16);
+  context.font = "700 " + Math.round(w * 0.015) + "px Arial";
+  context.fillText(path || "", w / 2, h * 0.22);
+  context.restore();
+}
+
+function renderTimeline(activeIndex) {
+  els.timeline.innerHTML = "";
+  slides.forEach((slide, index) => {
+    const dot = document.createElement("div");
+    dot.className = "dot" + (index === activeIndex ? " active" : "");
+    dot.title = slide.name;
+    dot.addEventListener("click", () => drawSlide(index));
+    els.timeline.appendChild(dot);
+  });
+}
+
+function playSlideshow(forRecording = false) {
+  if (!slides.length) {
+    els.status.textContent = "Your product did not load yet.";
+    return;
+  }
+
+  stopSlideshow(false);
+  playing = true;
+  currentSlideIndex = 0;
+  els.playBtn.disabled = true;
+  els.status.textContent = forRecording ? "Recording slideshow. Keep this tab open until it finishes." : "Playing slideshow preview.";
+
+  if (els.musicPlayer.src) {
+    els.musicPlayer.currentTime = 0;
+    els.musicPlayer.play().catch(() => {});
+  }
+
+  const seconds = Number(els.secondsPerSlide.value);
+  drawSlide(currentSlideIndex);
+
+  slideTimer = setInterval(() => {
+    if (!playing) return;
+    currentSlideIndex += 1;
+
+    if (currentSlideIndex >= slides.length) {
+      stopSlideshow(true);
+      if (recording && mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+      return;
+    }
+
+    drawSlide(currentSlideIndex);
+  }, seconds * 1000);
+}
+
+function stopSlideshow(completed) {
+  playing = false;
+  els.playBtn.disabled = false;
+  if (slideTimer) clearInterval(slideTimer);
+  slideTimer = null;
+  if (!recording) els.musicPlayer.pause();
+  if (completed && !recording) els.status.textContent = "Slideshow preview finished.";
+}
+
+async function exportVideo() {
+  if (!("MediaRecorder" in window)) {
+    els.status.textContent = "This browser does not support video export. Use Chrome or Edge.";
+    return;
+  }
+
+  if (!slides.length) {
+    els.status.textContent = "Your product did not load yet.";
+    return;
+  }
+
+  await generatePreview();
+
+  recordedChunks = [];
+  recording = true;
+  els.recordBtn.disabled = true;
+  els.recordBtn.textContent = "Exporting...";
+  els.videoDownloadLink.classList.remove("show");
+
+  // Record at 30 FPS from the 1920 x 1080 canvas.
+  const stream = els.stage.captureStream(30);
+  const finalStream = new MediaStream(stream.getVideoTracks());
+
+  if (els.musicPlayer.src) {
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      const audioContext = new AudioContextClass();
+      const destination = audioContext.createMediaStreamDestination();
+      const source = audioContext.createMediaElementSource(els.musicPlayer);
+      source.connect(destination);
+      source.connect(audioContext.destination);
+      destination.stream.getAudioTracks().forEach(track => finalStream.addTrack(track));
+    } catch (error) {
+      console.warn("Audio capture not available", error);
+    }
+  }
+
+  const mimeTypes = ["video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"];
+  const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type)) || "";
+
+try {
+  const recorderOptions = mimeType ? {
+    mimeType: mimeType,
+    videoBitsPerSecond: 50000000,
+    audioBitsPerSecond: 192000
+  } : {
+    videoBitsPerSecond: 50000000,
+    audioBitsPerSecond: 192000
+  };
+
+  mediaRecorder = new MediaRecorder(finalStream, recorderOptions);
+} catch (error) {
+  els.status.textContent = "Could not start video export in this browser.";
+  recording = false;
+  els.recordBtn.disabled = false;
+  els.recordBtn.textContent = "Export Video";
+  return;
+}
+
+  mediaRecorder.ondataavailable = event => {
+    if (event.data && event.data.size > 0) recordedChunks.push(event.data);
+  };
+
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(recordedChunks, { type: "video/webm" });
+    const url = URL.createObjectURL(blob);
+    els.videoDownloadLink.href = url;
+    els.videoDownloadLink.download = (theme.outputFileName || "slideshow") + ".webm";
+    els.videoDownloadLink.classList.add("show");
+    els.status.textContent = "Export complete. Click the green download button.";
+    recording = false;
+    els.recordBtn.disabled = false;
+    els.recordBtn.textContent = "Export Video";
+    els.musicPlayer.pause();
+  };
+
+  mediaRecorder.start(250);
+  playSlideshow(true);
+}
+</script>
+</body>
+</html>
