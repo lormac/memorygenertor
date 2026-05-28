@@ -317,12 +317,19 @@ let mediaRecorder = null;
 let recordedChunks = [];
 
 els.unlockBtn.addEventListener("click", unlockCode);
-els.accessCodeInput.addEventListener("keydown", e => { if (e.key === "Enter") unlockCode(); });
-els.useDefaultMusic.addEventListener("change", setupDefaultMusic);
+
+els.accessCodeInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") unlockCode();
+});
+
+if (els.useDefaultMusic) {
+  els.useDefaultMusic.addEventListener("change", setupDefaultMusic);
+}
+
+els.generateBtn.addEventListener("click", generatePreview);
 els.playBtn.addEventListener("click", () => playSlideshow(false));
 els.stopBtn.addEventListener("click", () => stopSlideshow(false));
 els.recordBtn.addEventListener("click", exportVideo);
-els.generateBtn.addEventListener("click", generatePreview);
 
 drawFallbackBackground(ctx, els.stage.width, els.stage.height);
 
