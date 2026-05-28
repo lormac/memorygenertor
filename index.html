@@ -322,6 +322,7 @@ els.useDefaultMusic.addEventListener("change", setupDefaultMusic);
 els.playBtn.addEventListener("click", () => playSlideshow(false));
 els.stopBtn.addEventListener("click", () => stopSlideshow(false));
 els.recordBtn.addEventListener("click", exportVideo);
+els.generateBtn.addEventListener("click", generatePreview);
 
 drawFallbackBackground(ctx, els.stage.width, els.stage.height);
 
@@ -850,20 +851,27 @@ function setCanvasQuality() {
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 }
-
 async function generatePreview() {
+  console.log("Generate Preview clicked");
+
   if (!slides.length) {
     els.status.textContent = "Your product did not load yet.";
     return;
   }
 
   setCanvasQuality();
-  currentSlideIndex = 0;
-  renderTimeline(0);
-  await drawSlide(0);
+
+  if (currentSlideIndex < 0 || currentSlideIndex >= slides.length) {
+    currentSlideIndex = 0;
+  }
+
+  renderTimeline(currentSlideIndex);
+  await drawSlide(currentSlideIndex);
+
   els.videoDownloadLink.classList.remove("show");
-  els.status.textContent = "Preview generated.";
+  els.status.textContent = "Slideshow preview updated.";
 }
+
 
 async function drawSlide(index) {
   if (!slides.length) {
