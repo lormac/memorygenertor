@@ -460,14 +460,7 @@ async function loadSlidesFromTheme() {
   "Unlocked: " + escapeHtml(theme.name || "Theme");
   els.status.textContent = "Product loaded.";
 }
-slides.sort(compareSlides);
-buildSlideForms();
-renderTimeline(0);
 
-if (slides.length) {
-  currentSlideIndex = 0;
-  await drawSlide(0);
-}
 
 
 
