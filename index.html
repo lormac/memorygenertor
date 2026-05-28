@@ -135,7 +135,35 @@ canvas{width:100%;height:100%;display:block;background:#10223d}
 .download-link.show{display:block}
 .notice{color:var(--muted);font-size:13px;line-height:1.45;margin-top:12px}
 code{color:#ffef9b}
-@media(max-width:980px){.app{grid-template-columns:1fr}.left{position:static;max-height:none}.access-row{grid-template-columns:1fr}}
+@media (max-width: 980px) {
+  .app {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .right {
+    order: 1;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 10px;
+    background: #07131f;
+  }
+
+  .left {
+    order: 2;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .stage-shell {
+    border-radius: 14px;
+  }
+
+  #timeline {
+    display: none;
+  }
+}
 </style>
 </head>
 <body>
