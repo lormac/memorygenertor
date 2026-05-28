@@ -242,6 +242,8 @@ const els = {
   accessStatus: document.getElementById("accessStatus"),
   loadStatus: document.getElementById("loadStatus"),
   slideForms: document.getElementById("slideForms"),
+  slideSelect: document.getElementById("slideSelect"),
+  slideEditor: document.getElementById("slideEditor"),
   musicInput: document.getElementById("musicInput"),
   secondsPerSlide: document.getElementById("secondsPerSlide"),
   exportQuality: document.getElementById("exportQuality"),
@@ -380,6 +382,7 @@ async function loadThemeFonts() {
   }
 }
 function buildSlideDropdown() {
+  if (!els.slideSelect) return;
   els.slideSelect.innerHTML = "";
 
   slides.forEach((slide, index) => {
@@ -396,6 +399,7 @@ function buildSlideDropdown() {
 }
 
 function showSelectedSlideEditor(index) {
+  if (!els.slideEditor) return;
   els.slideEditor.innerHTML = "";
 
   const slide = slides[index];
@@ -466,8 +470,24 @@ async function loadSlidesFromTheme() {
   els.status.textContent = "Product loaded.";
 }
 
+function normalizeSlide(raw) {
+  const slide = { ...(raw || {}) };
 
+  slide.fileName = slide.fileName || slide.__fileName || "";
+  slide.name = slide.name || slide.title || slide.fileName.replace(/\.json$/i, "") || "Slide";
 
+  slide.canvas = slide.canvas || theme?.canvas || { width: 1920, height: 1080 };
+
+  if (typeof slide.background === "string") {
+    slide.background = { path: slide.background };
+  }
+
+  slide.decor = Array.isArray(slide.decor) ? slide.decor : [];
+  slide.text = Array.isArray(slide.text) ? slide.text : [];
+  slide.photos = Array.isArray(slide.photos) ? slide.photos : [];
+
+  return slide;
+}
 
 function sameLayer(a, b) {
   return (a.name && b.name && a.name === b.name) || (a.path && b.path && a.path === b.path);
@@ -495,10 +515,18 @@ function getSortValue(slide) {
 }
 
 function buildSlideForms() {
-  els.slideForms.innerHTML = "";
+  const formContainer = els.slideForms || els.slideEditor;
+
+  if (!formContainer) {
+    console.error("Missing slide form container. Add <div id=\"slideForms\"></div> or <div id=\"slideEditor\"></div> to the HTML.");
+    els.status.textContent = "The slide editor area is missing from the page.";
+    return;
+  }
+
+  formContainer.innerHTML = "";
 
   if (!slides.length) {
-    els.slideForms.innerHTML = '<div class="status">No slides loaded.</div>';
+    formContainer.innerHTML = '<div class="status">No slides loaded.</div>';
     return;
   }
 
@@ -637,7 +665,7 @@ function buildSlideForms() {
     });
 
     details.appendChild(body);
-    els.slideForms.appendChild(details);
+    formContainer.appendChild(details);
   });
 }
 
