@@ -423,11 +423,7 @@ async function loadSlidesFromTheme() {
   }
 
   els.loadStatus.innerHTML =
-    "Unlocked: " + escapeHtml(theme.name || "Theme") +
-    "<br>Loaded " + slides.length + " slide(s)." +
-    "<br>" + report.map(escapeHtml).join("<br>");
-
-  els.status.textContent = "Product loaded.";
+  "Unlocked: " + escapeHtml(theme.name || "Theme");
 }
 
 function resolveThemePath(path) {
