@@ -288,9 +288,8 @@ const els = {
   slideForms: document.getElementById("slideForms"),
   slideSelect: document.getElementById("slideSelect"),
   slideEditor: document.getElementById("slideEditor"),
-  musicInput: document.getElementById("musicInput"),
-  secondsPerSlide: document.getElementById("secondsPerSlide"),
   generateBtn: document.getElementById("generateBtn"),
+  useDefaultMusic: document.getElementById("useDefaultMusic"),
   playBtn: document.getElementById("playBtn"),
   stopBtn: document.getElementById("stopBtn"),
   recordBtn: document.getElementById("recordBtn"),
@@ -319,8 +318,7 @@ let recordedChunks = [];
 
 els.unlockBtn.addEventListener("click", unlockCode);
 els.accessCodeInput.addEventListener("keydown", e => { if (e.key === "Enter") unlockCode(); });
-els.musicInput.addEventListener("change", handleMusicUpload);
-els.generateBtn.addEventListener("click", generatePreview);
+els.useDefaultMusic.addEventListener("change", setupDefaultMusic);
 els.playBtn.addEventListener("click", () => playSlideshow(false));
 els.stopBtn.addEventListener("click", () => stopSlideshow(false));
 els.recordBtn.addEventListener("click", exportVideo);
@@ -353,7 +351,7 @@ async function unlockCode() {
 
     await loadTheme(accessRecord.themeManifest);
 	await loadThemeFonts();
-
+  setupDefaultMusic();
 	els.accessScreen.classList.add("hidden");
 	els.appScreen.classList.remove("hidden");
 
@@ -421,6 +419,19 @@ async function loadThemeFonts() {
 
   if (document.fonts && document.fonts.ready) {
     await document.fonts.ready;
+  }
+}
+
+function setupDefaultMusic() {
+  if (!els.musicPlayer || !theme || !theme.music || !theme.music.path) return;
+
+  if (els.useDefaultMusic && els.useDefaultMusic.checked) {
+    els.musicPlayer.src = resolveThemePath(theme.music.path);
+    els.musicPlayer.loop = false;
+  } else {
+    els.musicPlayer.pause();
+    els.musicPlayer.removeAttribute("src");
+    els.musicPlayer.load();
   }
 }
 function buildSlideDropdown() {
@@ -1230,6 +1241,18 @@ function renderTimeline(activeIndex) {
     els.timeline.appendChild(dot);
   });
 }
+function getSlideDuration(index) {
+  if (
+    theme &&
+    theme.music &&
+    Array.isArray(theme.music.slideDurations) &&
+    theme.music.slideDurations[index]
+  ) {
+    return Number(theme.music.slideDurations[index]);
+  }
+
+  return 5;
+}
 
 function playSlideshow(forRecording = false) {
   if (!slides.length) {
@@ -1241,27 +1264,39 @@ function playSlideshow(forRecording = false) {
   playing = true;
   currentSlideIndex = 0;
   els.playBtn.disabled = true;
-  els.status.textContent = forRecording ? "Recording slideshow. Keep this tab open until it finishes." : "Playing slideshow preview.";
+  els.status.textContent = forRecording
+    ? "Recording slideshow. Keep this tab open until it finishes."
+    : "Playing slideshow preview.";
 
-  if (els.musicPlayer.src) {
+  if (els.musicPlayer.src && els.useDefaultMusic && els.useDefaultMusic.checked) {
     els.musicPlayer.currentTime = 0;
     els.musicPlayer.play().catch(() => {});
   }
 
-  const seconds = Number(els.secondsPerSlide.value);
   drawSlide(currentSlideIndex);
+  scheduleNextSlide();
+}
 
-  slideTimer = setInterval(() => {
+function scheduleNextSlide() {
+  if (!playing) return;
+
+  const seconds = getSlideDuration(currentSlideIndex);
+
+  slideTimer = setTimeout(() => {
     if (!playing) return;
+
     currentSlideIndex += 1;
 
     if (currentSlideIndex >= slides.length) {
       stopSlideshow(true);
-      if (recording && mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+      if (recording && mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+      }
       return;
     }
 
     drawSlide(currentSlideIndex);
+    scheduleNextSlide();
   }, seconds * 1000);
 }
 
