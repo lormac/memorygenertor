@@ -1,0 +1,71 @@
+{
+  "name": "06_2_portrait_photos",
+  "themeId": "dino_birthday",
+  "themePath": "themes/dino_birthday",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+    "photos": [
+    {
+      "kind": "photo",
+      "name": "photo_1",
+      "field": "photo_1",
+      "photoIndex": 0,
+      "x": 4.43,
+      "y": 45.06,
+      "w": 20.75,
+      "h": 50.69,
+      "anchor": "top-left",
+      "z": 0
+    },
+    {
+      "kind": "photo",
+      "name": "photo_2",
+      "field": "photo_2",
+      "photoIndex": 1,
+      "x": 74.04,
+      "y": 37.51,
+      "w": 20.75,
+      "h": 50.69,
+      "anchor": "top-left",
+      "z": 0
+    }
+  ],
+
+  "background": {
+    "kind": "background",
+    "asset": "DINO_5_3 FRAMES.png",
+    "path": "themes/dino_birthday/backgrounds/DINO_6_2 FRAMES.png",
+    "z": 1
+  },
+"text": [
+    {
+      "kind": "text",
+      "name": "Text_1",
+      "field": "Update Text 1 (optional)",
+      "sampleText": "A birthday full of laughs",
+      "x": 10,
+      "y": 2,
+      "w": 80,
+      "h": 15.83,
+      "anchor": "top-left",
+      "style": "red_jungle_title",
+      "z": 2
+    },
+    {
+      "kind": "text",
+      "name": "Text_2",
+      "field": "Text_2",
+      "sampleText": "And memories big as dinosaurs",
+      "x": 20,
+      "y": 85,
+      "w": 80,
+      "h": 15.83,
+      "anchor": "top-left",
+      "style": "red_jungle_title",
+      "z": 3
+    }
+  ],
+  "decor": []
+}

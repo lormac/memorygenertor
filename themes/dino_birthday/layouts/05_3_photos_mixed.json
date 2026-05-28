@@ -1,0 +1,96 @@
+{
+  "name": "05_3_mixed_photos",
+  "themeId": "dino_birthday",
+  "themePath": "themes/dino_birthday",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+    "photos": [
+    {
+      "kind": "photo",
+      "name": "photo_1",
+      "field": "photo_1",
+      "photoIndex": 0,
+      "x": 7.97,
+      "y": 32.22,
+      "w": 20.73,
+      "h": 56.85,
+      "anchor": "top-left",
+      "z": 0
+    },
+    {
+      "kind": "photo",
+      "name": "photo_2",
+      "field": "photo_2",
+      "photoIndex": 1,
+      "x": 35.68,
+      "y": 40.74,
+      "w": 31.77,
+      "h": 41.67,
+      "anchor": "top-left",
+      "z": 0
+    },
+    {
+      "kind": "photo",
+      "name": "photo_3",
+      "field": "photo_3",
+      "photoIndex": 2,
+      "x": 72.92,
+      "y": 33.98,
+      "w": 22.14,
+      "h": 33.06,
+      "anchor": "top-left",
+      "z": 0
+    }
+  ],
+
+  "background": {
+    "kind": "background",
+    "asset": "DINO_5_3 FRAMES.png",
+    "path": "themes/dino_birthday/backgrounds/DINO_5_3 FRAMES.png",
+    "z": 1
+  },
+  "text": [
+    {
+      "kind": "text",
+      "name": "Text_1",
+      "field": "Line1 - Edit Me!  (optional)",
+      "sampleText": "Its a great day",
+      "x": 0,
+      "y": 0,
+      "w": 100,
+      "h": 15,
+      "anchor": "top-left",
+      "style": "green_jungle_title_smaller",
+      "z": 2
+    },
+    {
+      "kind": "text",
+      "name": "Text_2",
+      "field": "Line2 - Edit Me!  (optional)",
+      "sampleText": "for a birthday party!",
+      "x": 0,
+      "y": 8,
+      "w": 100,
+      "h": 15,
+      "anchor": "top-left",
+      "style": "green_jungle_title_smaller",
+      "z": 3
+    },
+    {
+      "kind": "text",
+      "name": "Text_3",
+      "field": "AGE (Enter a Number)",
+      "sampleText": "2",
+      "x": 66,
+      "y": 20,
+      "w": 14,
+      "h": 23,
+      "anchor": "top-left",
+      "style": "red_jungle_title_larger",
+      "z": 4
+    }
+  ],
+  "decor": []
+}

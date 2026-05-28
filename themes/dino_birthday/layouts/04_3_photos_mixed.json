@@ -1,0 +1,69 @@
+{
+  "name": "04_3_mixed_photos",
+  "themeId": "dino_birthday",
+  "themePath": "themes/dino_birthday",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+    "photos": [
+    {
+      "kind": "photo",
+      "name": "photo_1",
+      "field": "photo_1",
+	  "photoIndex": 0,
+      "x": 21,
+	  "y": 44,
+	  "w": 18,
+	  "h": 46,
+      "anchor": "top-left",
+      "z": 0
+    },
+	{
+      "kind": "photo",
+      "name": "photo_2",
+      "field": "photo_2",
+	  "photoIndex": 0,
+      "x": 56,
+	  "y": 17,
+	  "w": 31,
+	  "h": 38,
+      "anchor": "top-left",
+      "z": 0
+    },
+	{
+      "kind": "photo",
+      "name": "photo_3",
+      "field": "photo_3",
+	  "photoIndex": 0,
+      "x": 71,
+	  "y": 60,
+	  "w": 28,
+	  "h": 30,
+      "anchor": "top-left",
+      "z": 0
+    }
+  ],
+  "background": {
+    "kind": "background",
+    "asset": "DINO_4_3 FRAMES.png",
+    "path": "themes/dino_birthday/backgrounds/DINO_4_3 FRAMES.png",
+    "z": 1
+  },
+  "text": [
+    {
+      "kind": "text",
+      "name": "small_message",
+      "field": "small_message",
+      "sampleText": "Insert a message",
+      "x": 16,
+      "y": 6.5,
+      "w": 30.42,
+      "h": 28.8,
+      "anchor": "top-left",
+      "style": "Lava Glow",
+      "z": 2
+    }
+  ],
+  "decor": []
+}

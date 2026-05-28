@@ -1,0 +1,45 @@
+{
+  "name": "03_1_landscape_photo",
+  "themeId": "dino_birthday",
+  "themePath": "themes/dino_birthday",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+    "photos": [
+    {
+      "kind": "photo",
+      "name": "photo_1",
+      "field": "photo_1",
+	  "photoIndex": 0,
+      "x": 30.73,
+      "y": 13.52,
+      "w": 40.1,
+      "h": 47.59,
+      "anchor": "top-left",
+      "z": 0
+    }
+  ],
+  "background": {
+    "kind": "background",
+    "asset": "03_1_landscape_photo_overlay.png",
+    "path": "themes/dino_birthday/slides/03_1_landscape_photo_overlay.png",
+    "z": 1
+  },
+  "text": [
+    {
+      "kind": "text",
+      "name": "small_message",
+      "field": "small_message",
+      "sampleText": "Insert a message",
+      "x": 16.41,
+      "y": 70.65,
+      "w": 68.75,
+      "h": 15.19,
+      "anchor": "top-left",
+      "style": "Red with blue shadow",
+      "z": 2
+    }
+  ],
+  "decor": []
+}
