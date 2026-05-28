@@ -111,8 +111,12 @@ canvas{width:100%;height:100%;display:block;background:#10223d}
   align-items:center;
 }
 .slide-accordion summary::-webkit-details-marker{display:none}
-.slide-accordion summary::after{content:"Open";color:#ffd94a;font-size:12px;text-transform:uppercase;letter-spacing:1px}
-.slide-accordion[open] summary::after{content:"Close"}
+.slide-accordion summary::after{
+  content:"";
+}
+.slide-accordion summary::after{
+  content:"";
+}
 .slide-accordion-body{padding:14px}
 .slide-pill{display:inline-block;padding:5px 8px;border-radius:999px;background:rgba(85,228,122,.18);color:#b8ffca;font-size:12px;margin-left:6px}
 .slide-empty{color:#b7c7d8;font-size:13px;line-height:1.45}
@@ -418,9 +422,8 @@ function buildSlideDropdown() {
     const option = document.createElement("option");
     option.value = index;
     option.textContent =
-      (completedSlides.has(index) ? "✅ " : "") +
-      "Slide " + (index + 1) + " - " + cleanName(slide.name || "Edit");
-
+  (completedSlides.has(index) ? "✅ " : "") +
+  "Slide " + (index + 1);
     els.slideSelect.appendChild(option);
   });
 
@@ -585,9 +588,7 @@ function buildSlideForms() {
 
     const summary = document.createElement("summary");
     summary.innerHTML =
-      "<span>Slide " + (slideIndex + 1) + "  " + escapeHtml(cleanName(slide.name)) +
-      '<span class="slide-pill">' + textLayers.length + " text</span>" +
-      '<span class="slide-pill">' + photoLayers.length + " photo</span></span>";
+  "<span>Slide " + (slideIndex + 1) + "</span>";
     details.appendChild(summary);
 
     summary.addEventListener("click", () => setTimeout(() => drawSlide(slideIndex), 0));
