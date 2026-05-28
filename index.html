@@ -168,6 +168,28 @@ code{color:#ffef9b}
     display: none;
   }
 }
+.music-toggle-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:18px 0 10px;
+}
+
+.music-toggle-row input[type="checkbox"]{
+  width:20px;
+  height:20px;
+  accent-color:#ffd94a;
+  cursor:pointer;
+}
+
+.music-toggle-label{
+  margin:0;
+  color:var(--accent);
+  font-weight:900;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
@@ -197,20 +219,12 @@ code{color:#ffef9b}
 
 <div id="slideForms"></div>     
 
-<div class="section-title">Music</div>
-
-<label>
+<div class="music-toggle-row">
   <input id="useDefaultMusic" type="checkbox" checked />
-  Include theme music
-</label>
-
-      <label for="secondsPerSlide">Seconds Per Slide</label>
-      <select id="secondsPerSlide">
-        <option value="3">3 seconds</option>
-        <option value="4" selected>4 seconds</option>
-        <option value="5">5 seconds</option>
-        <option value="6">6 seconds</option>
-      </select>
+  <label for="useDefaultMusic" class="music-toggle-label">
+    INCLUDE THEME MUSIC
+  </label>
+</div>
 
    
       <div class="button-grid">
