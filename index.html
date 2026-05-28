@@ -423,11 +423,14 @@ async function loadThemeFonts() {
 }
 
 function setupDefaultMusic() {
-  if (!els.musicPlayer || !theme || !theme.music || !theme.music.path) return;
+  if (!els.musicPlayer || !theme?.music?.path) return;
 
-  if (els.useDefaultMusic && els.useDefaultMusic.checked) {
-    els.musicPlayer.src = resolveThemePath(theme.music.path);
+  if (els.useDefaultMusic?.checked) {
+    const musicPath = resolveThemePath(theme.music.path);
+    els.musicPlayer.src = musicPath;
     els.musicPlayer.loop = false;
+    els.musicPlayer.load();
+    console.log("Theme music loaded:", musicPath);
   } else {
     els.musicPlayer.pause();
     els.musicPlayer.removeAttribute("src");
@@ -1254,11 +1257,13 @@ function getSlideDuration(index) {
   return 5;
 }
 
-function playSlideshow(forRecording = false) {
-  if (!slides.length) {
-    els.status.textContent = "Your product did not load yet.";
-    return;
-  }
+if (els.musicPlayer.src && els.useDefaultMusic?.checked) {
+  els.musicPlayer.currentTime = 0;
+  els.musicPlayer.play().catch(error => {
+    console.warn("Music could not play:", error);
+    els.status.textContent = "Preview is playing, but the browser blocked the music. Click Play again.";
+  });
+}
 
   stopSlideshow(false);
   playing = true;
@@ -1298,7 +1303,7 @@ function scheduleNextSlide() {
     drawSlide(currentSlideIndex);
     scheduleNextSlide();
   }, seconds * 1000);
-  
+
 }
 
 function stopSlideshow(completed) {
