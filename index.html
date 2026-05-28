@@ -195,11 +195,14 @@ code{color:#ffef9b}
 <label for="slideSelect">Choose a slide to edit:</label>
 <select id="slideSelect"></select>
 
-<div id="slideForms"></div>
+<div id="slideForms"></div>     
 
-      <div class="section-title">Music And Export</div>
-      <label for="musicInput">Optional Music</label>
-      <input id="musicInput" type="file" accept="audio/*" />
+<div class="section-title">Music</div>
+
+<label>
+  <input id="useDefaultMusic" type="checkbox" checked />
+  Include theme music
+</label>
 
       <label for="secondsPerSlide">Seconds Per Slide</label>
       <select id="secondsPerSlide">
@@ -209,12 +212,7 @@ code{color:#ffef9b}
         <option value="6">6 seconds</option>
       </select>
 
-      <label for="exportQuality">Export Quality</label>
-      <select id="exportQuality">
-        <option value="720" selected>HD 1280 by 720</option>
-        <option value="1080">Full HD 1920 by 1080</option>
-      </select>
-
+   
       <div class="button-grid">
         <button id="generateBtn">Generate Preview</button>
         <button id="playBtn" class="secondary">Play</button>
@@ -278,7 +276,6 @@ const els = {
   slideEditor: document.getElementById("slideEditor"),
   musicInput: document.getElementById("musicInput"),
   secondsPerSlide: document.getElementById("secondsPerSlide"),
-  exportQuality: document.getElementById("exportQuality"),
   generateBtn: document.getElementById("generateBtn"),
   playBtn: document.getElementById("playBtn"),
   stopBtn: document.getElementById("stopBtn"),
@@ -313,7 +310,6 @@ els.generateBtn.addEventListener("click", generatePreview);
 els.playBtn.addEventListener("click", () => playSlideshow(false));
 els.stopBtn.addEventListener("click", () => stopSlideshow(false));
 els.recordBtn.addEventListener("click", exportVideo);
-els.exportQuality.addEventListener("change", generatePreview);
 
 drawFallbackBackground(ctx, els.stage.width, els.stage.height);
 
