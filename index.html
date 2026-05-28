@@ -876,7 +876,8 @@ async function generatePreview() {
   await drawSlide(currentSlideIndex);
 
   els.videoDownloadLink.classList.remove("show");
-  els.status.textContent = "Slideshow preview updated.";
+els.playBtn.disabled = false;
+els.status.textContent = "Slideshow preview updated.";
 }
 
 
