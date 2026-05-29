@@ -408,8 +408,7 @@
     "textureAsset": "themes/dino_birthday/textures/green_cracked_stone.png",
     "textureSizePercent": 150,
     "shadowOpacity": 70
-  }
-  },
+    },
   "fonts": [
   {
     "fontFamily": "Luckiest Guy",
