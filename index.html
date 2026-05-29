@@ -235,11 +235,11 @@ code{color:#ffef9b}
       </div>
 
       <a id="videoDownloadLink" class="download-link" download="slideshow.webm">Download Slideshow Video</a>
-      <p class="notice">This browser version exports WebM. Chrome or Edge works best. Production MP4 export should be rendered server side.</p>
+      <p class="notice">This browser preview/export is optimized for quick customer downloads. For premium MP4 output, render server-side later.</p>
     </aside>
 
     <section class="card right">
-      <div class="stage-shell"><canvas id="stage" width="1280" height="720"></canvas></div>
+      <div class="stage-shell"><canvas id="stage" width="1920" height="1080"></canvas></div>
       <div id="timeline" class="timeline"></div>
       <div id="status" class="status">Enter your code to begin.</div>
     </section>
@@ -318,6 +318,8 @@ let recording = false;
 let slideTimer = null;
 let mediaRecorder = null;
 let recordedChunks = [];
+let audioContextForExport = null;
+let audioSourceNodeForExport = null;
 
 els.unlockBtn.addEventListener("click", unlockCode);
 
@@ -855,9 +857,10 @@ function handleMusicUpload() {
 
 function setCanvasQuality() {
   // Force all preview and export rendering to true Full HD.
-  // This prevents the exported video from being recorded from a soft 720p canvas.
-  els.stage.width = 1920;
-  els.stage.height = 1080;
+  // Important: only resize if needed. Resizing a canvas clears it, which caused black first-slide exports.
+  if (els.stage.width !== 1920) els.stage.width = 1920;
+  if (els.stage.height !== 1080) els.stage.height = 1080;
+
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 }
@@ -886,7 +889,13 @@ async function preloadAllSlideAssets() {
     }
   }
 
-  await Promise.all(jobs);
+  const results = await Promise.all(jobs);
+  const missing = results.filter(item => item && item.ok === false);
+
+  if (missing.length) {
+    console.warn("Missing slideshow assets:", missing.map(item => item.src));
+    els.status.textContent = "Some slideshow art could not load. Check the console for missing file paths.";
+  }
 
   if (document.fonts?.ready) {
     await document.fonts.ready;
@@ -895,6 +904,10 @@ async function preloadAllSlideAssets() {
   // Give the browser two paint ticks so the canvas, fonts, and images are fully settled.
   await new Promise(requestAnimationFrame);
   await new Promise(requestAnimationFrame);
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function generatePreview() {
@@ -1300,14 +1313,18 @@ function renderTimeline(activeIndex) {
     els.timeline.appendChild(dot);
   });
 }
-async function playSlideshow(forRecording = false) {
+async function playSlideshow(forRecording = false, options = {}) {
   if (!slides.length) {
     els.status.textContent = "Your product did not load yet.";
     return;
   }
 
   setCanvasQuality();
-  await preloadAllSlideAssets();
+
+  if (!options.skipPreload) {
+    await preloadAllSlideAssets();
+  }
+
   stopSlideshow(false);
 
   playing = true;
@@ -1318,7 +1335,7 @@ async function playSlideshow(forRecording = false) {
     ? "Recording slideshow. Keep this tab open until it finishes."
     : "Playing slideshow preview.";
 
-  if (els.musicPlayer && els.musicPlayer.src && els.useDefaultMusic?.checked) {
+  if (!options.skipMusic && els.musicPlayer && els.musicPlayer.src && els.useDefaultMusic?.checked) {
     els.musicPlayer.currentTime = 0;
     els.musicPlayer.play().catch(error => {
       console.warn("Music could not play:", error);
@@ -1405,14 +1422,24 @@ async function exportVideo() {
   const stream = els.stage.captureStream(30);
   const finalStream = new MediaStream(stream.getVideoTracks());
 
-  if (els.musicPlayer.src) {
+  if (els.musicPlayer && els.musicPlayer.src && els.useDefaultMusic?.checked) {
     try {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      const audioContext = new AudioContextClass();
-      const destination = audioContext.createMediaStreamDestination();
-      const source = audioContext.createMediaElementSource(els.musicPlayer);
-      source.connect(destination);
-      source.connect(audioContext.destination);
+      if (!audioContextForExport) {
+        audioContextForExport = new AudioContextClass();
+      }
+
+      if (!audioSourceNodeForExport) {
+        audioSourceNodeForExport = audioContextForExport.createMediaElementSource(els.musicPlayer);
+        audioSourceNodeForExport.connect(audioContextForExport.destination);
+      }
+
+      if (audioContextForExport.state === "suspended") {
+        await audioContextForExport.resume();
+      }
+
+      const destination = audioContextForExport.createMediaStreamDestination();
+      audioSourceNodeForExport.connect(destination);
       destination.stream.getAudioTracks().forEach(track => finalStream.addTrack(track));
     } catch (error) {
       console.warn("Audio capture not available", error);
@@ -1431,11 +1458,11 @@ const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
 try {
   const recorderOptions = mimeType ? {
     mimeType,
-    videoBitsPerSecond: 12000000,
-    audioBitsPerSecond: 192000
+    videoBitsPerSecond: 25000000,
+    audioBitsPerSecond: 256000
   } : {
-    videoBitsPerSecond: 12000000,
-    audioBitsPerSecond: 192000
+    videoBitsPerSecond: 25000000,
+    audioBitsPerSecond: 256000
   };
 
   mediaRecorder = new MediaRecorder(finalStream, recorderOptions);
@@ -1464,8 +1491,12 @@ try {
     if (els.musicPlayer) els.musicPlayer.pause();
   };
 
-  mediaRecorder.start(250);
-  playSlideshow(true);
+  // Start recording only after slide 1 is already fully painted.
+  await drawSlide(0);
+  await sleep(250);
+
+  mediaRecorder.start(1000);
+  await playSlideshow(true, { skipPreload: true });
 }
 </script>
 </body>
