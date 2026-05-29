@@ -302,6 +302,12 @@ const els = {
 
 const ctx = els.stage.getContext("2d");
 
+// Premium render size.
+// The canvas displays normally, but internally renders at 4K for sharper photos, text, strokes, and video export.
+const EXPORT_SCALE = 2;
+const EXPORT_W = 1920 * EXPORT_SCALE;
+const EXPORT_H = 1080 * EXPORT_SCALE;
+
 // Keep preview/export crisp from the first paint.
 setCanvasQuality();
 
@@ -856,10 +862,10 @@ function handleMusicUpload() {
 }
 
 function setCanvasQuality() {
-  // Force all preview and export rendering to true Full HD.
-  // Important: only resize if needed. Resizing a canvas clears it, which caused black first-slide exports.
-  if (els.stage.width !== 1920) els.stage.width = 1920;
-  if (els.stage.height !== 1080) els.stage.height = 1080;
+  // Render internally at 4K while the CSS keeps the preview responsive.
+  // This prevents the entire slideshow from looking soft after recording/compression.
+  if (els.stage.width !== EXPORT_W) els.stage.width = EXPORT_W;
+  if (els.stage.height !== EXPORT_H) els.stage.height = EXPORT_H;
 
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
@@ -998,6 +1004,9 @@ async function drawPhotos(slide, slideIndex, w, h) {
 }
 
 function drawLayerImage(context, img, layer, canvasW, canvasH) {
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+
   const x = (Number(layer.x ?? 0) / 100) * canvasW;
   const y = (Number(layer.y ?? 0) / 100) * canvasH;
   const w = (Number(layer.w ?? 100) / 100) * canvasW;
@@ -1006,6 +1015,9 @@ function drawLayerImage(context, img, layer, canvasW, canvasH) {
 }
 
 function drawPhotoLayer(context, layer, photo, canvasW, canvasH) {
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+
   const x = (Number(layer.x ?? 0) / 100) * canvasW;
   const y = (Number(layer.y ?? 0) / 100) * canvasH;
   const w = (Number(layer.w ?? 100) / 100) * canvasW;
@@ -1070,6 +1082,9 @@ context.stroke();
 }
 
 function drawImageCover(context, img, x, y, w, h) {
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+
   const iw = img.naturalWidth || img.width;
   const ih = img.naturalHeight || img.height;
   const scale = Math.max(w / iw, h / ih);
@@ -1453,7 +1468,7 @@ async function exportVideo() {
   els.recordBtn.textContent = "Exporting...";
   els.videoDownloadLink.classList.remove("show");
 
-  // Record at 30 FPS from the 1920 x 1080 canvas.
+  // Record at 30 FPS from the supersampled 4K canvas.
   const stream = els.stage.captureStream(30);
   const finalStream = new MediaStream(stream.getVideoTracks());
 
@@ -1493,10 +1508,10 @@ const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
 try {
   const recorderOptions = mimeType ? {
     mimeType,
-    videoBitsPerSecond: 25000000,
+    videoBitsPerSecond: 50000000,
     audioBitsPerSecond: 256000
   } : {
-    videoBitsPerSecond: 25000000,
+    videoBitsPerSecond: 50000000,
     audioBitsPerSecond: 256000
   };
 
