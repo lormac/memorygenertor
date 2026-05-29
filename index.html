@@ -1437,20 +1437,21 @@ async function exportVideo() {
     }
   }
 
-  const mimeTypes = ["video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"];
-  const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type)) || "";
+
+const mimeTypes = [
+  "video/webm;codecs=vp9,opus",
+  "video/webm;codecs=vp8,opus",
+  "video/webm"
+];
+
+const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
 
 try {
-  const recorderOptions = mimeType ? {
-    mimeType: mimeType,
-    videoBitsPerSecond: 50000000,
-    audioBitsPerSecond: 192000
-  } : {
-    videoBitsPerSecond: 50000000,
-    audioBitsPerSecond: 192000
-  };
+  const recorderOptions = mimeType ? { mimeType } : undefined;
 
   mediaRecorder = new MediaRecorder(finalStream, recorderOptions);
+}
+
 } catch (error) {
   els.status.textContent = "Could not start video export in this browser.";
   recording = false;
@@ -1464,7 +1465,7 @@ try {
   };
 
   mediaRecorder.onstop = () => {
-    const blob = new Blob(recordedChunks, { type: "video/webm" });
+    const blob = new Blob(recordedChunks, { type: mimeType || "video/webm" });
     const url = URL.createObjectURL(blob);
     els.videoDownloadLink.href = url;
     els.videoDownloadLink.download = (theme.outputFileName || "slideshow") + ".webm";
