@@ -194,7 +194,7 @@ code{color:#ffef9b}
 </head>
 <body>
 <header>
-  <h1 id="pageTitle">Slideshow Generator</h1>
+  <h1 id="pageTitle">Memory Generator</h1>
   <p class="subtitle" id="pageSubtitle">Enter your access code to unlock your purchased product.</p>
 </header>
 
@@ -206,7 +206,7 @@ code{color:#ffef9b}
       <input id="accessCodeInput" placeholder="Enter your code" />
       <button id="unlockBtn">Unlock</button>
     </div>
-    <div id="accessStatus" class="status">Demo code in the included sample file: DINO-BUNDLE</div>
+    
   </section>
 
   <section id="appScreen" class="app hidden">
@@ -664,7 +664,7 @@ function buildSlideForms() {
 
       body.appendChild(label);
       body.appendChild(input);
-      body.appendChild(meta);
+      /* body.appendChild(meta); */
     });
 
     photoLayers.forEach((layer, photoSlotIndex) => {
