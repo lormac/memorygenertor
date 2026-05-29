@@ -1024,11 +1024,46 @@ function drawPhotoLayer(context, layer, photo, canvasW, canvasH) {
     grd.addColorStop(1, "#3fb7ff");
     context.fillStyle = grd;
     context.fillRect(x, y, w, h);
-    context.fillStyle = "rgba(0,0,0,.5)";
-    context.font = Math.round(canvasW * 0.026) + "px Arial";
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.fillText("Upload Photo", x + w / 2, y + h / 2);
+    const placeholderOpacity = 0.22;
+
+context.fillStyle = "rgba(255,255,255,0.08)";
+context.fillRect(x, y, w, h);
+
+context.strokeStyle = "rgba(255,255,255,0.18)";
+context.lineWidth = Math.max(2, canvasW * 0.0015);
+context.strokeRect(x, y, w, h);
+
+const iconSize = Math.min(w, h) * 0.35;
+
+context.strokeStyle = `rgba(255,255,255,${placeholderOpacity})`;
+context.lineWidth = Math.max(3, canvasW * 0.002);
+
+const iconX = x + (w - iconSize) / 2;
+const iconY = y + (h - iconSize) / 2;
+
+context.strokeRect(
+  iconX,
+  iconY,
+  iconSize,
+  iconSize * 0.75
+);
+
+context.beginPath();
+context.arc(
+  iconX + iconSize * 0.72,
+  iconY + iconSize * 0.22,
+  iconSize * 0.06,
+  0,
+  Math.PI * 2
+);
+context.stroke();
+
+context.beginPath();
+context.moveTo(iconX + iconSize * 0.12, iconY + iconSize * 0.65);
+context.lineTo(iconX + iconSize * 0.35, iconY + iconSize * 0.42);
+context.lineTo(iconX + iconSize * 0.55, iconY + iconSize * 0.60);
+context.lineTo(iconX + iconSize * 0.82, iconY + iconSize * 0.30);
+context.stroke();
   }
 
   context.restore();
