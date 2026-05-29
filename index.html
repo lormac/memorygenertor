@@ -302,6 +302,9 @@ const els = {
 
 const ctx = els.stage.getContext("2d");
 
+// Keep preview/export crisp from the first paint.
+setCanvasQuality();
+
 let accessRecord = null;
 let theme = null;
 let slides = [];
@@ -440,7 +443,7 @@ function setupDefaultMusic() {
     els.musicPlayer.load();
     console.log("Theme music loaded:", musicPath);
   } else {
-    els.musicPlayer.pause();
+    if (els.musicPlayer) els.musicPlayer.pause();
     els.musicPlayer.removeAttribute("src");
     els.musicPlayer.load();
   }
@@ -858,6 +861,42 @@ function setCanvasQuality() {
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 }
+
+async function preloadAllSlideAssets() {
+  if (!slides.length) return;
+
+  els.status.textContent = "Loading slideshow art...";
+
+  const jobs = [];
+
+  for (const slide of slides) {
+    if (slide.background?.path) {
+      jobs.push(loadImage(slide.background.path));
+    }
+
+    for (const layer of (slide.decor || [])) {
+      if (layer.path) jobs.push(loadImage(layer.path));
+    }
+
+    for (const textLayer of (slide.text || [])) {
+      const style = textStyles[textLayer.style] || textStyles.default;
+      if (style?.useTexture && style.textureAsset) {
+        jobs.push(loadImage(style.textureAsset));
+      }
+    }
+  }
+
+  await Promise.all(jobs);
+
+  if (document.fonts?.ready) {
+    await document.fonts.ready;
+  }
+
+  // Give the browser two paint ticks so the canvas, fonts, and images are fully settled.
+  await new Promise(requestAnimationFrame);
+  await new Promise(requestAnimationFrame);
+}
+
 async function generatePreview() {
   console.log("Generate Preview clicked");
 
@@ -867,6 +906,7 @@ async function generatePreview() {
   }
 
   setCanvasQuality();
+  await preloadAllSlideAssets();
 
   if (currentSlideIndex < 0 || currentSlideIndex >= slides.length) {
     currentSlideIndex = 0;
@@ -1260,74 +1300,14 @@ function renderTimeline(activeIndex) {
     els.timeline.appendChild(dot);
   });
 }
-function getSlideDuration(index) {
-  if (
-    theme &&
-    theme.music &&
-    Array.isArray(theme.music.slideDurations) &&
-    theme.music.slideDurations[index]
-  ) {
-    return Number(theme.music.slideDurations[index]);
-  }
-
-  return 5;
-}
-
-if (els.musicPlayer.src && els.useDefaultMusic?.checked) {
-  els.musicPlayer.currentTime = 0;
-  els.musicPlayer.play().catch(error => {
-    console.warn("Music could not play:", error);
-    els.status.textContent = "Preview is playing, but the browser blocked the music. Click Play again.";
-  });
-}
-
-  stopSlideshow(false);
-  playing = true;
-  currentSlideIndex = 0;
-  els.playBtn.disabled = false;
-  els.status.textContent = forRecording
-    ? "Recording slideshow. Keep this tab open until it finishes."
-    : "Playing slideshow preview.";
-
-  if (els.musicPlayer.src && els.useDefaultMusic && els.useDefaultMusic.checked) {
-    els.musicPlayer.currentTime = 0;
-    els.musicPlayer.play().catch(() => {});
-  }
-
-  drawSlide(currentSlideIndex);
-  scheduleNextSlide();
-
-
-function scheduleNextSlide() {
-  if (!playing) return;
-
-  const seconds = getSlideDuration(currentSlideIndex);
-
-  slideTimer = setTimeout(() => {
-    if (!playing) return;
-
-    currentSlideIndex += 1;
-
-    if (currentSlideIndex >= slides.length) {
-      stopSlideshow(true);
-      if (recording && mediaRecorder && mediaRecorder.state !== "inactive") {
-        mediaRecorder.stop();
-      }
-      return;
-    }
-
-    drawSlide(currentSlideIndex);
-    scheduleNextSlide();
-  }, seconds * 1000);
-
-}
-
-function playSlideshow(forRecording = false) {
+async function playSlideshow(forRecording = false) {
   if (!slides.length) {
     els.status.textContent = "Your product did not load yet.";
     return;
   }
 
+  setCanvasQuality();
+  await preloadAllSlideAssets();
   stopSlideshow(false);
 
   playing = true;
@@ -1345,7 +1325,7 @@ function playSlideshow(forRecording = false) {
     });
   }
 
-  drawSlide(currentSlideIndex);
+  await drawSlide(currentSlideIndex);
   scheduleNextSlide();
 }
 
@@ -1354,7 +1334,7 @@ function scheduleNextSlide() {
 
   const seconds = getSlideDuration(currentSlideIndex);
 
-  slideTimer = setTimeout(() => {
+  slideTimer = setTimeout(async () => {
     if (!playing) return;
 
     currentSlideIndex += 1;
@@ -1369,7 +1349,7 @@ function scheduleNextSlide() {
       return;
     }
 
-    drawSlide(currentSlideIndex);
+    await drawSlide(currentSlideIndex);
     scheduleNextSlide();
   }, seconds * 1000);
 }
@@ -1412,6 +1392,8 @@ async function exportVideo() {
   }
 
   await generatePreview();
+  await preloadAllSlideAssets();
+  await drawSlide(0);
 
   recordedChunks = [];
   recording = true;
@@ -1447,11 +1429,16 @@ const mimeTypes = [
 const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
 
 try {
-  const recorderOptions = mimeType ? { mimeType } : undefined;
+  const recorderOptions = mimeType ? {
+    mimeType,
+    videoBitsPerSecond: 12000000,
+    audioBitsPerSecond: 192000
+  } : {
+    videoBitsPerSecond: 12000000,
+    audioBitsPerSecond: 192000
+  };
 
   mediaRecorder = new MediaRecorder(finalStream, recorderOptions);
-}
-
 } catch (error) {
   els.status.textContent = "Could not start video export in this browser.";
   recording = false;
@@ -1474,7 +1461,7 @@ try {
     recording = false;
     els.recordBtn.disabled = false;
     els.recordBtn.textContent = "Export Video";
-    els.musicPlayer.pause();
+    if (els.musicPlayer) els.musicPlayer.pause();
   };
 
   mediaRecorder.start(250);
