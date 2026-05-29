@@ -183,13 +183,13 @@
 	  "shadowOpacity": 40,
 	  "glowColor": "#ff7a00",
 	  "glowSize": 0,
-	  "glowOpacity": 55,
+	  "glowOpacity": 0,
 	  "useTexture": true,
 	  "textureAsset": "themes/dino_birthday/textures/red mossy rocks.png",
-	  "textureSizePercent": 140,
+	  "textureSizePercent": 100,
 	  "texturePosX": 50,
 	  "texturePosY": 50,
-	  "textureContrast": 20
+	  "textureContrast": 50
 	},
 	"red_jungle_title_smaller": {
 	  "fontFamily": "Luckiest Guy",
