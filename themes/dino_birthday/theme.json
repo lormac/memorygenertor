@@ -9,7 +9,7 @@
 	  "mode": "standard",
 	  "path": "music/dino_standard_song_30_seconds.mp3",
 	  "timingMode": "fixed",
-	  "slideDurations": [5, 5, 5, 5, 5, 5],
+	  "slideDurations": [5, 5, 5, 5, 5, 4],
 	  "defaultEnabled": true
 	},
   
