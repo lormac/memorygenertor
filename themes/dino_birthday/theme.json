@@ -66,10 +66,10 @@
 	  "glowOpacity": 55,
 	  "useTexture": true,
 	  "textureAsset": "themes/dino_birthday/textures/green mossy rocks.png",
-	  "textureSizePercent": 140,
+	  "textureSizePercent": 100,
 	  "texturePosX": 50,
 	  "texturePosY": 50,
-	  "textureContrast": 20
+	  "textureContrast": 40
 	},
 	"green_jungle_title_smaller": {
 	  "fontFamily": "Luckiest Guy",
