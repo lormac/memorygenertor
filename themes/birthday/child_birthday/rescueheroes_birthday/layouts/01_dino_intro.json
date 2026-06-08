@@ -1,0 +1,48 @@
+{
+  "name": "dino_intro",
+  "themeId": "dino_birthday",
+  "themePath": "themes/dino_birthday",
+  "backgroundAsset": "dino_bg_05_intro.png",
+  "canvas": {
+    "width": 1672,
+    "height": 941
+  },
+  "background": {
+    "kind": "background",
+    "asset": "dino_bg_05_intro.png",
+    "path": "themes/dino_birthday/backgrounds/dino_bg_05_intro.png",
+    "z": -1
+  },
+  "photos": [
+
+  ],
+  "text": [
+    {
+      "kind": "text",
+      "name": "Child's Name",
+      "field": "name",
+      "sampleText": "CHILDS NAME",
+      "x": 23.98,
+      "y": 52.5,
+      "w": 56.64,
+      "h": 24.97,
+      "style": "green_jungle_title",
+      "z": 0
+    },
+    {
+      "kind": "text",
+      "name": "Child's Age",
+      "field": "age",
+      "sampleText": "9",
+      "x": 62.49,
+      "y": 74.52,
+      "w": 10.59,
+      "h": 23.17,
+      "style": "green_jungle_title",
+      "z": 1
+    }
+  ],
+  "decor": [
+
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "order": 2,
+  "name": "dino_1_landscape_with_happy_birthday",
+  "themeId": "dino_birthday",
+  "themePath": "themes/dino_birthday",
+  "canvas": {
+    "width": 1920,
+    "height": 1080
+  },
+  "background": {
+    "kind": "background",
+    "asset": "dino_1_landscape_with_happy_birthday.png",
+    "path": "themes/dino_birthday/backgrounds/dino_1_landscape_with_happy_birthday.png",
+    "z": 1
+  },
+  "photos": [
+    {
+      "kind": "photo",
+      "name": "photo_1",
+      "field": "photo_1",
+      "photoIndex": 1,
+      "x": 39,
+	  "y": 56,
+	  "w": 25,
+	  "h": 33,
+      "anchor": "top-left",
+      "z": 0
+    }
+  ],
+  "text": [],
+  "decor": []
+}
+
+
