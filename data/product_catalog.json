@@ -1,0 +1,8 @@
+{
+  "dino_birthday": {
+    "title": "Dinosaur Birthday Slideshow",
+    "generator": "slideshow",
+    "type": "slideshow",
+    "themeManifest": "/themes/birthday/child_birthday/dino_birthday/theme.json"
+  }
+}
