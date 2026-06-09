@@ -1,0 +1,2279 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Graduation Slideshow Generator Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Allura&display=swap" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    background: radial-gradient(circle at top, #2a1a00, #050505 55%, #000);
+    color: #f8f1dc;
+    font-family: Arial, sans-serif;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    min-height: 100vh;
+  }
+  @font-face {
+	  font-family: 'MarkerFont';
+	  src: url('fonts/PermanentMarker-Regular.ttf') format('truetype');
+	  font-weight: 400;
+	}
+
+  .sidebar {
+    padding: 20px;
+    background: rgba(0,0,0,.72);
+    border-right: 1px solid rgba(212,175,55,.4);
+  }
+
+  h1 {
+    font-family: Georgia, serif;
+    color: #f6df8f;
+    font-size: 26px;
+  }
+
+  label {
+    display: block;
+    margin-top: 14px;
+    margin-bottom: 5px;
+    color: #f6df8f;
+    font-weight: bold;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px;
+    border-radius: 8px;
+    border: 1px solid rgba(212,175,55,.5);
+    background: #111;
+    color: white;
+  }
+
+  textarea {
+    min-height: 60px;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #d4af37, #f6df8f, #8a6a18);
+    color: #050505;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .preview-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+  }
+
+  #stage {
+    position: relative;
+    width: 960px;
+    height: 540px;
+    background: black;
+    overflow: hidden;
+    box-shadow: 0 0 45px rgba(212,175,55,.35);
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+
+  .slide.active {
+    opacity: 1;
+  }
+
+  .slide-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 2;
+  }
+
+  .photo-box {
+    position: absolute;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .photo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1);
+  }
+
+  .slide.active .photo-box img {
+    animation: kenburns 6s linear forwards;
+  }
+
+  @keyframes kenburns {
+    from { transform: scale(1); }
+    to { transform: scale(1.12); }
+  }
+
+  .text-box {
+    position: absolute;
+    z-index: 3;
+color: #F6DF8F;
+
+
+
+
+
+	font-family: 'Montserrat', sans-serif;
+	font-weight: 800;
+	letter-spacing: 2px;
+	
+text-shadow:
+  0 2px 4px rgba(0,0,0,.9),
+  0 0 12px rgba(212,175,55,.45);
+	  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: pre-line;
+    opacity: 0;
+    filter: brightness(.8);
+  }
+
+  .slide.active .text-box {
+    animation: textGlowIn 1.8s ease forwards;
+  }
+
+ @keyframes textGlowIn {
+  0% {
+    opacity: 1;
+    transform: scale(.96);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+  .hidden {
+    display: none;
+  }
+  .then-now-frame {
+  position: absolute;
+  left: 9%;
+  top: 24%;
+  width: 32%;
+  height: 56%;
+  z-index: 2;
+  overflow: hidden;
+  border: 10px solid #d4af37;
+  box-shadow: 0 0 25px rgba(212,175,55,.65);
+  
+}
+
+.slide.active .then-now-frame {
+  animation: moveFrameRight 8s ease-in-out forwards;
+}
+
+.slide.active .then-photo-old {
+  animation: oldPhotoFade 8s ease-in-out forwards;
+}
+
+.slide.active .then-photo-new {
+  animation: newPhotoFade 8s ease-in-out forwards, gentleZoom 8s linear forwards;
+}
+
+.slide.active .then-text-old {
+  animation: oldTextFade 8s ease-in-out forwards;
+}
+
+.slide.active .then-text-new {
+  animation: newTextFade 8s ease-in-out forwards;
+}
+
+.then-now-frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.then-photo-old {
+  opacity: 1;
+  }
+
+.then-photo-new {
+  opacity: 0;
+ }
+
+.then-text-old {
+  position: absolute;
+  right: 8%;
+  top: 32%;
+  width: 34%;
+  z-index: 3;
+  color: #f6df8f;
+  font-family: Georgia, serif;
+  font-size: 44px;
+  font-weight: bold;
+  text-align: center;
+  white-space: pre-line;
+  text-shadow: 0 0 18px rgba(0,0,0,.9);
+}
+
+.then-text-new {
+  position: absolute;
+  left: 7%;
+  top: 32%;
+  width: 34%;
+  z-index: 3;
+  color: #f6df8f;
+  font-family: Georgia, serif;
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+  white-space: pre-line;
+  text-shadow: 0 0 18px rgba(0,0,0,.9), 0 0 20px rgba(212,175,55,.45);
+  opacity: 0;
+  
+}
+
+@keyframes moveFrameRight {
+  0%, 25% {
+    left: 9%;
+  }
+  75%, 100% {
+    left: 59%;
+  }
+}
+
+@keyframes oldPhotoFade {
+  0%, 35% {
+    opacity: 1;
+  }
+  70%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes newPhotoFade {
+  0%, 35% {
+    opacity: 0;
+  }
+  70%, 100% {
+    opacity: 1;
+  }
+}
+
+@keyframes gentleZoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes oldTextFade {
+  0%, 35% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  55%, 100% {
+    opacity: 0;
+    filter: brightness(.5);
+  }
+}
+
+@keyframes newTextFade {
+  0%, 45% {
+    opacity: 0;
+    transform: scale(.95);
+    filter: brightness(.7);
+  }
+  75%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1.25);
+  }
+}
+.memory-center {
+  position: absolute;
+  left: 38%;
+  top: 25%;
+  width: 24%;
+  height: 46%;
+  z-index: 5;
+  overflow: hidden;
+  border: 8px solid #d4af37;
+  border-radius: 50%;
+  box-shadow: 0 0 30px rgba(212,175,55,.7);
+}
+
+
+.memory-center img,
+.orbit-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.memory-orbit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 760px;
+  height: 540px;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+}
+
+.slide.active .memory-orbit {
+  animation: orbitSpin 18s linear infinite;
+}
+
+
+
+
+.orbit-photo {
+  position: absolute;
+  width: 145px;
+  height: 145px;
+  overflow: hidden;
+  border: 5px solid #d4af37;
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(212,175,55,.45);
+}
+
+.orbit-photo:nth-child(1) {
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.orbit-photo:nth-child(2) {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.orbit-photo:nth-child(3) {
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+}
+
+.orbit-photo:nth-child(4) {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.memory-orbit-text {
+  position: absolute;
+  left: 5%;
+  bottom: 8%;
+  width: 90%;
+  z-index: 6;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 2px;
+  color: #F6DF8F;
+  font-size: 42px;
+  font-weight: 800;
+  text-align: center;
+  white-space: pre-line;
+  text-shadow:
+     0 3px 6px rgba(0,0,0,.95),
+    0 0 14px rgba(212,175,55,.35);
+  opacity: 0;
+}
+
+
+.slide.active .memory-orbit {
+  animation: orbitSpin 18s linear infinite;
+}
+
+.slide.active .orbit-photo img {
+  animation: keepOrbitPhotoUpright 18s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes keepOrbitPhotoUpright {
+  from {
+    transform: rotate(0deg) scale(1.12);
+  }
+
+  to {
+    transform: rotate(-360deg) scale(1.12);
+  }
+}
+
+
+.slide.active .memory-orbit-text {
+  animation: textGlowIn 1.8s ease forwards;
+}
+
+@keyframes orbitSpin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+
+
+
+.scatter-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.scatter-card {
+  --s: 10px;
+  --b: 3px;
+  --c: #d4af37;
+
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  padding: var(--s);
+  box-sizing: border-box;
+  z-index: 50;
+  opacity: 0;
+  transform: scale(.8) translateY(20px);
+
+  --_g: #0000 25%, var(--c) 0;
+
+  background:
+    conic-gradient(from 90deg at top var(--b) left var(--b), var(--_g)) 0 0,
+    conic-gradient(from 180deg at top var(--b) right var(--b), var(--_g)) 100% 0,
+    conic-gradient(from 0deg at bottom var(--b) left var(--b), var(--_g)) 0 100%,
+    conic-gradient(from -90deg at bottom var(--b) right var(--b), var(--_g)) 100% 100%;
+
+  background-size: 15% 15%;
+  background-repeat: no-repeat;
+}
+
+.scatter-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.slide.active .scatter-card {
+  animation: scatterCardReveal 1.2s ease forwards;
+}
+
+.slide.active .scatter-card.p1 { animation-delay: 0s; }
+.slide.active .scatter-card.p2 { animation-delay: .7s; }
+.slide.active .scatter-card.p3 { animation-delay: 1.4s; }
+.slide.active .scatter-card.p4 { animation-delay: 2.1s; }
+.slide.active .scatter-card.p5 { animation-delay: 2.8s; }
+
+@keyframes scatterCardReveal {
+  0% {
+    opacity: 0;
+    transform: scale(.8) translateY(20px);
+    background-size: 15% 15%;
+    filter: brightness(.7) blur(2px);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.06) translateY(0);
+    filter: brightness(1.25) blur(0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    background-size: 45% 45%;
+    filter: brightness(1);
+  }
+}
+
+.scatter-text {
+  position: absolute;
+  left: 28%;
+  top: 40%;
+  width: 44%;
+  z-index: 60;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 1px;
+  color: #F6DF8F;
+  font-size: 42px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.15;
+  white-space: pre-line;
+  text-shadow:
+    0 2px 4px rgba(0,0,0,.9),
+    0 0 10px rgba(212,175,55,.30);
+
+  opacity: 0;
+}
+
+.slide.active .scatter-text {
+  animation: textGlowIn 1.8s ease forwards;
+  animation-delay: 3.4s;
+}
+
+.polaroid-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.polaroid-stack {
+  position: absolute;
+  left: 14%;
+  top: 14%;
+  width: 320px;
+  height: 390px;
+  z-index: 20;
+}
+
+.polaroid-card {
+  position: absolute;
+  width: 320px;
+  height: 390px;
+  background: #fffdf4;
+  padding: 18px 18px 62px 18px;
+  box-sizing: border-box;
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.55),
+    0 0 18px rgba(212,175,55,.22);
+  opacity: 1;
+  transform-origin: center center;
+}
+
+.polaroid-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* stacked look */
+.polaroid-card.p1 { transform: rotate(-7deg) translate(-18px, 12px); z-index: 6; }
+.polaroid-card.p2 { transform: rotate(5deg) translate(14px, 5px); z-index: 5; }
+.polaroid-card.p3 { transform: rotate(-3deg) translate(-8px, -4px); z-index: 4; }
+.polaroid-card.p4 { transform: rotate(8deg) translate(18px, -10px); z-index: 3; }
+.polaroid-card.p5 { transform: rotate(-5deg) translate(-14px, -16px); z-index: 2; }
+.polaroid-card.p6 { transform: rotate(2deg) translate(6px, -22px); z-index: 1; }
+
+.slide.active .polaroid-card.p1 {
+  animation: dropPolaroid1 1.1s ease-in forwards;
+  animation-delay: 3s;
+}
+
+.slide.active .polaroid-card.p2 {
+  animation: dropPolaroid2 1.1s ease-in forwards;
+  animation-delay: 6s;
+}
+
+.slide.active .polaroid-card.p3 {
+  animation: dropPolaroid3 1.1s ease-in forwards;
+  animation-delay: 9s;
+}
+
+.slide.active .polaroid-card.p4 {
+  animation: dropPolaroid4 1.1s ease-in forwards;
+  animation-delay: 12s;
+}
+
+.slide.active .polaroid-card.p5 {
+  animation: dropPolaroid5 1.1s ease-in forwards;
+  animation-delay: 15s;
+}
+
+.polaroid-card.p6 {
+  z-index: 1;
+}
+
+@keyframes dropPolaroid1 {
+  to {
+    transform: rotate(-22deg) translate(-520px, 440px);
+    opacity: 0;
+  }
+}
+
+@keyframes dropPolaroid2 {
+  to {
+    transform: rotate(24deg) translate(560px, 440px);
+    opacity: 0;
+  }
+}
+
+@keyframes dropPolaroid3 {
+  to {
+    transform: rotate(-25deg) translate(-500px, 460px);
+    opacity: 0;
+  }
+}
+
+@keyframes dropPolaroid4 {
+  to {
+    transform: rotate(26deg) translate(540px, 470px);
+    opacity: 0;
+  }
+}
+
+@keyframes dropPolaroid5 {
+  to {
+    transform: rotate(-20deg) translate(-480px, 480px);
+    opacity: 0;
+  }
+}
+
+.polaroid-text {
+  position: absolute;
+  left: 53%;
+  top: 32%;
+  width: 48%;
+  z-index: 30;
+  color: #F6DF8F;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 1px;
+  font-size: 42px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+  white-space: pre-line;
+  text-shadow:
+    0 2px 4px rgba(0,0,0,.90),
+    0 0 8px rgba(212,175,55,.25);
+  opacity: 0;
+}
+
+.slide.active .polaroid-text {
+  animation: textGlowIn 1.8s ease forwards;
+  animation-delay: 1s;
+}
+
+.polaroid-caption {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 14px;
+  height: 40px;
+  color: #111;
+  font-family: 'MarkerFont', 'Comic Sans MS', cursive;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 40px;
+  overflow: hidden;
+}
+
+.gallery-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-photo {
+  position: absolute;
+  width: 180px;
+  height: 120px;
+  overflow: hidden;
+  border: 4px solid rgba(212,175,55,.4);
+  box-shadow: 0 0 15px rgba(0,0,0,.6);
+  filter: brightness(.35);
+}
+
+.gallery-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gallery-photo.g1 { left: 8%; top: 15%; }
+.gallery-photo.g2 { left: 39%; top: 15%; }
+.gallery-photo.g3 { left: 70%; top: 15%; }
+
+.gallery-photo.g4 { left: 8%; top: 60%; }
+.gallery-photo.g5 { left: 39%; top: 60%; }
+.gallery-photo.g6 { left: 70%; top: 60%; }
+
+.slide.active .gallery-photo.g1 {
+  animation: spotlightPhoto 3s ease forwards;
+}
+
+.slide.active .gallery-photo.g2 {
+  animation: spotlightPhoto 3s ease forwards;
+  animation-delay: 3s;
+}
+
+.slide.active .gallery-photo.g3 {
+  animation: spotlightPhoto 3s ease forwards;
+  animation-delay: 6s;
+}
+
+.slide.active .gallery-photo.g4 {
+  animation: spotlightPhoto 3s ease forwards;
+  animation-delay: 9s;
+}
+
+.slide.active .gallery-photo.g5 {
+  animation: spotlightPhoto 3s ease forwards;
+  animation-delay: 12s;
+}
+
+.slide.active .gallery-photo.g6 {
+  animation: spotlightPhoto 3s ease forwards;
+  animation-delay: 15s;
+}
+
+@keyframes spotlightPhoto {
+
+  0% {
+    filter: brightness(.35);
+    transform: scale(1);
+  }
+
+  20% {
+    filter: brightness(1.6);
+    transform: scale(1.08);
+    box-shadow:
+      0 0 40px rgba(212,175,55,.9);
+  }
+
+  80% {
+    filter: brightness(1.6);
+    transform: scale(1.08);
+    box-shadow:
+      0 0 40px rgba(212,175,55,.9);
+  }
+
+  100% {
+    filter: brightness(.35);
+    transform: scale(1);
+  }
+}
+
+.gallery-text {
+  position: absolute;
+  left: 28%;
+  top: 43%;
+  width: 44%;
+  z-index: 30;
+  color: #F6DF8F;
+  font-size: 36px;
+   font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  text-align: center;
+  white-space: pre-line;
+   text-shadow:
+    0 3px 6px rgba(0,0,0,.95),
+    0 0 12px rgba(212,175,55,.35);
+}
+
+.gallery-beam {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  z-index: 12;
+  pointer-events: none;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 232, 150, 0.55) 0%,
+    rgba(212, 175, 55, 0.28) 32%,
+    rgba(212, 175, 55, 0.08) 60%,
+    transparent 75%
+  );
+
+  filter: blur(10px);
+  opacity: 0;
+}
+
+.slide.active .gallery-beam {
+  animation: galleryBeamMove 21s ease-in-out forwards;
+}
+
+@keyframes galleryBeamMove {
+  0% { opacity: 0; left: 4%; top: 10%; }
+  5%, 14% { opacity: 1; left: 4%; top: 10%; }
+  19%, 28% { left: 35%; top: 10%; }
+  33%, 42% { left: 66%; top: 10%; }
+  47%, 56% { left: 4%; top: 55%; }
+  61%, 70% { left: 35%; top: 55%; }
+  75%, 84% { left: 66%; top: 55%; }
+  90%, 100% { opacity: 0; left: 66%; top: 55%; }
+}
+
+/* Slide 8: Future Begins */
+.future-photo {
+  position: absolute;
+  left: 11.67%;
+  top: 10.09%;
+  width: 30.78%;
+  height: 78.43%;
+  overflow: hidden;
+  z-index: 1;
+  transform: rotate(-11deg);
+  transform-origin: center center;
+}
+
+.future-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform-origin: center center;
+}
+
+.slide.active .future-photo img {
+  animation: futureZoom 9s linear forwards;
+}
+
+@keyframes futureZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+.future-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 2;
+}
+
+.future-sweep {
+  position: absolute;
+  top: -20%;
+  left: -35%;
+  width: 20%;
+  height: 150%;
+  z-index: 3;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.18),
+    rgba(246,216,107,.35),
+    transparent
+  );
+  filter: blur(16px);
+  transform: rotate(18deg);
+  opacity: 0;
+}
+
+.slide.active .future-sweep {
+  animation: futureSweep 9s ease-in-out forwards;
+}
+
+@keyframes futureSweep {
+  0%, 20% { opacity: 0; left: -35%; }
+  35% { opacity: 1; }
+  75% { opacity: 1; left: 110%; }
+  100% { opacity: 0; left: 115%; }
+}
+
+.future-text {
+  position: absolute;
+  left: 59.58%;
+  top: 30.28%;
+  width: 33.54%;
+  height: 47.87%;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #F6DF8F;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 1px;
+  font-size: 52px;
+  font-weight: 700;
+  text-align: center;
+  white-space: pre-line;
+  text-shadow:
+    0 4px 8px rgba(0,0,0,.95),
+    0 0 14px rgba(212,175,55,.25);
+  opacity: 0;
+}
+
+.slide.active .future-text {
+  animation: textGlowIn 2s ease forwards;
+}
+
+
+/* -------------------------
+   Slide 9: Support Circle
+-------------------------- */
+.support-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.support-main {
+  position: absolute;
+  left: 37%;
+  top: 20%;
+  width: 26%;
+  height: 48%;
+  overflow: hidden;
+  border: 7px solid #d4af37;
+  box-shadow: 0 0 35px rgba(212,175,55,.65);
+  z-index: 6;
+}
+
+.support-main img,
+.support-small img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.slide.active .support-main img {
+  animation: kenburns 12s linear forwards;
+}
+
+.support-small {
+  position: absolute;
+  width: 150px;
+  height: 110px;
+  overflow: hidden;
+  border: 4px solid #d4af37;
+  box-shadow: 0 0 20px rgba(212,175,55,.45);
+  opacity: 0;
+  z-index: 5;
+}
+
+.support-small.s1 { left: 15%; top: 18%; }
+.support-small.s2 { left: 70%; top: 18%; }
+.support-small.s3 { left: 15%; top: 63%; }
+.support-small.s4 { left: 70%; top: 63%; }
+
+.slide.active .support-small.s1 {
+  animation: supportFadeIn 1.4s ease forwards;
+  animation-delay: 1s;
+}
+
+.slide.active .support-small.s2 {
+  animation: supportFadeIn 1.4s ease forwards;
+  animation-delay: 2s;
+}
+
+.slide.active .support-small.s3 {
+  animation: supportFadeIn 1.4s ease forwards;
+  animation-delay: 3s;
+}
+
+.slide.active .support-small.s4 {
+  animation: supportFadeIn 1.4s ease forwards;
+  animation-delay: 4s;
+}
+
+@keyframes supportFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(.85);
+    filter: brightness(.7) blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1.15) blur(0);
+  }
+}
+
+.support-text {
+  position: absolute;
+  left: 28%;
+  bottom: 7%;
+  width: 44%;
+  z-index: 30;
+  color: #F6DF8F;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 1px;
+  font-size: 44px;
+  font-weight: bold;
+  text-align: center;
+  white-space: pre-line;
+  text-shadow:
+    0 3px 6px rgba(0,0,0,.95),
+    0 0 10px rgba(212,175,55,.28);
+
+  opacity: 0;
+}
+
+.slide.active .support-text {
+  animation: textGlowIn 1.8s ease forwards;
+  animation-delay: 5.5s;
+}
+
+
+
+/* -------------------------
+   Slide 10: Grand Finale / Memory Constellation
+-------------------------- */
+.finale-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.finale-hero {
+  position: absolute;
+  left: 35%;
+  top: 18%;
+  width: 30%;
+  height: 55%;
+  overflow: hidden;
+  border: 7px solid #d4af37;
+  box-shadow:
+    0 0 35px rgba(212,175,55,.75),
+    0 18px 45px rgba(0,0,0,.7);
+  z-index: 8;
+}
+
+.finale-hero img,
+.finale-memory img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.slide.active .finale-hero img {
+  animation: finaleHeroZoom 14s linear forwards;
+}
+
+@keyframes finaleHeroZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.12); }
+}
+
+.finale-memory {
+  position: absolute;
+  width: 130px;
+  height: 95px;
+  overflow: hidden;
+  border: 4px solid rgba(212,175,55,.85);
+  box-shadow:
+    0 0 20px rgba(212,175,55,.45),
+    0 12px 28px rgba(0,0,0,.55);
+  z-index: 6;
+  opacity: 0;
+}
+
+.finale-memory.m1 { left: 12%; top: 10%; transform: rotate(-6deg); }
+.finale-memory.m2 { left: 75%; top: 12%; transform: rotate(5deg); }
+.finale-memory.m3 { left: 5%;  top: 42%; transform: rotate(4deg); }
+.finale-memory.m4 { left: 82%; top: 42%; transform: rotate(-5deg); }
+.finale-memory.m5 { left: 15%; top: 75%; transform: rotate(6deg); }
+.finale-memory.m6 { left: 72%; top: 75%; transform: rotate(-4deg); }
+
+.slide.active .finale-memory {
+  animation: finaleMemoryIn 1.4s ease forwards, finaleFloat 5s ease-in-out infinite;
+}
+
+.slide.active .finale-memory.m1 { animation-delay: .4s, 1.8s; }
+.slide.active .finale-memory.m2 { animation-delay: .8s, 2.2s; }
+.slide.active .finale-memory.m3 { animation-delay: 1.2s, 2.6s; }
+.slide.active .finale-memory.m4 { animation-delay: 1.6s, 3.0s; }
+.slide.active .finale-memory.m5 { animation-delay: 2.0s, 3.4s; }
+.slide.active .finale-memory.m6 { animation-delay: 2.4s, 3.8s; }
+
+@keyframes finaleMemoryIn {
+  from {
+    opacity: 0;
+    transform: scale(.75) translateY(20px);
+    filter: brightness(.65) blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1.12) blur(0);
+  }
+}
+
+@keyframes finaleFloat {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -10px; }
+}
+
+.finale-text {
+  position: absolute;
+  left: 24%;
+  bottom: 6%;
+  width: 52%;
+  z-index: 40;
+  color: #F6DF8F;;
+  font-family: 'Great Vibes', cursive;
+  
+  font-size: 72px;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.08;
+  white-space: pre-line;
+  
+
+  text-shadow:
+    0 4px 8px rgba(0,0,0,.98),
+    0 0 14px rgba(212,175,55,.35),
+    0 0 28px rgba(212,175,55,.18);
+
+  opacity: 0;
+}
+
+.slide.active .finale-text {
+  animation: textGlowIn 2s ease forwards;
+  animation-delay: 2.5s;
+}
+
+.finale-shine {
+  position: absolute;
+  top: -20%;
+  left: -35%;
+  width: 18%;
+  height: 150%;
+  z-index: 13;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.22),
+    rgba(246,216,107,.48),
+    transparent
+  );
+  filter: blur(14px);
+  transform: rotate(18deg);
+  opacity: 0;
+}
+
+.slide.active .finale-shine {
+  animation: finaleShineSweep 5s ease-in-out infinite;
+  animation-delay: 3.2s;
+}
+
+@keyframes finaleShineSweep {
+  0%, 20% { opacity: 0; left: -35%; }
+  35% { opacity: 1; }
+  75% { opacity: 1; left: 115%; }
+  100% { opacity: 0; left: 120%; }
+}
+
+
+.finale-memory.landscape { width:150px; height:100px; }
+.finale-memory.portrait { width:105px; height:145px; }
+.finale-memory.square { width:125px; height:125px; }
+
+.finale-hero.landscape {
+  left:30%; top:22%; width:40%; height:42%;
+}
+.finale-hero.portrait {
+  left:37%; top:16%; width:26%; height:58%;
+}
+.finale-hero.square {
+  left:34%; top:18%; width:32%; height:56%;
+}
+
+
+.photo-warning {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(255, 80, 80, 0.16);
+  border: 1px solid rgba(255, 120, 120, 0.65);
+  color: #ffd6d6;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+
+.export-status {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(212,175,55,.12);
+  border: 1px solid rgba(212,175,55,.45);
+  color: #f8f1dc;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.download-link {
+  display: block;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #d4af37, #f6df8f, #8a6a18);
+  color: #050505;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+}
+
+.audio-preview {
+  width: 100%;
+  margin-top: 10px;
+}
+.then-text-old,
+.then-text-new {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #F6DF8F;
+  text-shadow:
+    0 2px 4px rgba(0,0,0,.9),
+    0 0 12px rgba(212,175,55,.45);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="sidebar">
+    <h1>Graduation Slideshow Test</h1>
+
+    <label>Choose Slide</label>
+    <select id="slidePicker" onchange="showSelectedSlideControls()">
+      <option value="slide_01">Slide 1 - Opening</option>
+      <option value="slide_02">Slide 2 - Two Photos</option>
+	  <option value="slide_03">Slide 3 - Then & Now</option>
+	  <option value="slide_04">Slide 4 - Memory Orbit</option>
+	  <option value="slide_05">Slide 5 - Scattered Memories</option>
+	  <option value="slide_06">Slide 6 - Polaroid Stack</option>
+	  <option value="slide_07">Slide 7 - Spotlight Gallery</option>
+	  <option value="slide_08">Slide 8 - Future Begins</option>
+      <option value="slide_09">Slide 9 - Thank You</option>
+      <option value="slide_10">Slide 10 - Grand Finale</option>
+    </select>
+
+    
+
+    <div id="slide_01Controls" class="slide-controls">
+  <label>Slide 1 Photo</label>
+  <input type="file" id="photo1" accept="image/*">
+
+  <label>Slide 1 Text 1</label>
+  <input id="slide1Text1" value="Lisa Gallagher">
+
+  <label>Slide 1 Text 2</label>
+  <input id="slide1Text2" value="Class of 2026">
+</div>
+
+    <div id="slide_02Controls" class="slide-controls hidden">
+  <label>Upload 2 Portrait Photos</label>
+  <input type="file" id="slide2Photos" accept="image/*" multiple>
+
+  <div id="slide2PortraitWarning" class="photo-warning hidden"></div>
+
+  <label>Slide 2 Text 1</label>
+  <input id="slide2Text1" value="Lisa">
+
+  <label>Slide 2 Text 2</label>
+  <textarea id="slide2Text2">Class of
+2026</textarea>
+</div>
+
+<div id="slide_03Controls" class="slide-controls hidden">
+  <label>Kindergarten Photo</label>
+  <input type="file" id="photo4" accept="image/*">
+
+  <label>Current Grad Photo</label>
+  <input type="file" id="photo5" accept="image/*">
+
+  <label>Starting Text</label>
+  <textarea id="slide3Text1">Every journey
+starts with a dream</textarea>
+
+  <label>Ending Text</label>
+  <textarea id="slide3Text2">Look how far
+you've come</textarea>
+</div>
+<div id="slide_04Controls" class="slide-controls hidden">
+  <label>Center Memory Photo</label>
+<input type="file" id="slide4CenterPhoto" accept="image/*">
+
+<label>Upload 4 Orbit Photos</label>
+<input type="file" id="slide4Photos" accept="image/*" multiple>
+
+  <label>Slide 4 Text</label>
+  <textarea id="slide4Text">So many memories
+led to this moment</textarea>
+</div>
+
+<div id="slide_05Controls" class="slide-controls hidden">
+  <label>Upload 5 Scattered Memory Photos</label>
+  <input type="file" id="slide5Photos" accept="image/*" multiple>
+
+  <label>Slide 5 Text</label>
+  <textarea id="slide5Text">The moments
+that made the journey</textarea>
+</div>
+
+<div id="slide_06Controls" class="slide-controls hidden">
+  <label>
+    <input type="checkbox" id="polaroidCaptionsOn" onchange="togglePolaroidCaptions()">
+    Show Polaroid Captions
+  </label>
+
+  <div id="polaroidCaptionFields" class="hidden">
+    <label>Caption 1</label>
+    <input id="polaroidCaption1" value="First day">
+
+    <label>Caption 2</label>
+    <input id="polaroidCaption2" value="Big smile">
+
+    <label>Caption 3</label>
+    <input id="polaroidCaption3" value="School days">
+
+    <label>Caption 4</label>
+    <input id="polaroidCaption4" value="Best memories">
+
+    <label>Caption 5</label>
+    <input id="polaroidCaption5" value="Almost there">
+
+    <label>Caption 6</label>
+    <input id="polaroidCaption6" value="Graduation day">
+  </div>
+
+  <label>Upload 6 Polaroid Photos</label>
+  <input type="file" id="slide6Photos" accept="image/*" multiple>
+
+  <label>Slide 6 Text</label>
+  <textarea id="slide6Text">A lifetime of memories
+in every little moment</textarea>
+</div>
+
+<div id="slide_07Controls" class="slide-controls hidden">
+  <label>Upload 6 Gallery Photos</label>
+  <input type="file" id="slide7Photos" accept="image/*" multiple>
+
+  <label>Slide 7 Text</label>
+  <textarea id="slide7Text">Every Step
+Led To This Moment</textarea>
+</div>
+
+<div id="slide_08Controls" class="slide-controls hidden">
+
+  <label>Graduate Photo</label>
+  <input type="file" id="photo28" accept="image/*">
+
+  <label>Slide 8 Text</label>
+  <textarea id="slide8Text">The Future
+Begins Here</textarea>
+
+</div>
+
+
+
+<div id="slide_09Controls" class="slide-controls hidden">
+  <label>Upload 5 Thank You Photos</label>
+  <input type="file" id="slide9Photos" accept="image/*" multiple>
+
+  <label>Slide 9 Text</label>
+  <textarea id="slide9Text">Thank you
+for believing in me</textarea>
+</div>
+
+<div id="slide_10Controls" class="slide-controls hidden">
+
+  <label>Upload 7 Finale Photos</label>
+  <input type="file" id="slide10Photos" accept="image/*" multiple>
+
+  <label>Final Text</label>
+  <textarea id="slide10Text">Congratulations
+Graduate</textarea>
+
+</div>
+
+    
+<label>Optional Music MP3</label>
+<input type="file" id="musicUpload" accept="audio/mpeg,audio/mp3,audio/*">
+
+<audio id="musicPlayer" class="audio-preview" controls></audio>
+
+<button onclick="exportGraduationVideo()">Export WebM Video</button>
+<button onclick="exportCurrentSlideOnly()">Export Current Slide Only</button>
+
+<div id="exportStatus" class="export-status hidden"></div>
+<a id="videoDownloadLink" class="download-link hidden">Download WebM Video</a>
+
+
+    <button onclick="buildPreview()">Update Preview</button>
+    <button onclick="previewSelectedSlide()">Preview Selected Slide</button>
+    <button onclick="playShow()">Play Slideshow</button>
+  </div>
+
+  <div class="preview-area">
+    <div id="stage"></div>
+  </div>
+
+</div>
+
+<script>
+const layouts = {
+  slide_01: {
+	duration: 6000,
+    bg: "slides/slide_01.png",
+    photos: [
+      { photoIndex: 0, x: 28.83, y: 35.39, w: 40.25, h: 42.08 }
+    ],
+    text: [
+     { input: "slide1Text1", x: 12, y: 13.71, w: 75, h: 13.07, size: 72, font: "'Great Vibes', cursive", fontWeight: "400", letterSpacing: "0px" },
+     { input: "slide1Text2", x: 30.86, y: 82.15, w: 35.23, h: 12.96, size: 42, font: "'Montserrat', sans-serif", fontWeight: "800", letterSpacing: "2px" }
+    ]
+  },
+
+  slide_02: {
+	duration: 6000,
+    bg: "slides/slide_02.png",
+    photos: [
+      { photoIndex: 1, x: 9.9, y: 24.63, w: 21.72, h: 59.72 },
+      { photoIndex: 2, x: 41.67, y: 36.76, w: 17.29, h: 47.59 }
+    ],
+    text: [
+      { input: "slide2Text1", x: 66.41, y: 14.72, w: 25.1, h: 19.81, size: 56 },
+      { input: "slide2Text2", x: 71.25, y: 42, w: 15.47, h: 20, size: 42 }
+    ]
+  },
+  slide_03: {
+	duration: 8000,
+    customScene: "then_now"
+  },
+
+  slide_04: {
+	duration: 10000,
+    customScene: "memory_orbit"
+  },
+  slide_05: {
+  duration: 7000,
+  customScene: "scattered_memories"
+},
+
+slide_06: {
+  duration: 19000,
+  customScene: "polaroid_stack"
+},
+slide_07: {
+  duration: 21000,
+  customScene: "spotlight_gallery"
+},
+slide_08: {
+  duration: 9000,
+  customScene: "future_begins"
+},
+
+slide_09: {
+  duration: 12000,
+  customScene: "support_circle"
+},
+
+slide_10: {
+  duration: 14000,
+  customScene: "grand_finale"
+}
+
+};
+
+let photoURLs = [];
+let currentSlideIndex = 0;
+let timer = null;
+
+function fileToURL(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input.files || !input.files[0]) return null;
+  return URL.createObjectURL(input.files[0]);
+}
+
+function multiFileToURL(inputId, index) {
+  const input = document.getElementById(inputId);
+  if (!input || !input.files || !input.files[index]) return "";
+  return URL.createObjectURL(input.files[index]);
+}
+
+function setPhotoOrientationClass(img, box) {
+  img.onload = function () {
+    box.classList.remove("portrait","landscape","square");
+
+    const ratio = img.naturalWidth / img.naturalHeight;
+
+    if (ratio > 1.15) {
+      box.classList.add("landscape");
+    } else if (ratio < 0.85) {
+      box.classList.add("portrait");
+    } else {
+      box.classList.add("square");
+    }
+  };
+}
+
+
+function pct(v) {
+  return v + "%";
+}
+
+
+
+function checkMultiImageIsPortrait(inputId, index) {
+  return new Promise(resolve => {
+    const input = document.getElementById(inputId);
+
+    if (!input || !input.files || !input.files[index]) {
+      resolve({ ok: true, empty: true });
+      return;
+    }
+
+    const img = new Image();
+    const url = URL.createObjectURL(input.files[index]);
+
+    img.onload = function () {
+      const isPortrait = img.naturalHeight > img.naturalWidth;
+      URL.revokeObjectURL(url);
+
+      resolve({
+        ok: isPortrait,
+        empty: false,
+        width: img.naturalWidth,
+        height: img.naturalHeight
+      });
+    };
+
+    img.onerror = function () {
+      URL.revokeObjectURL(url);
+      resolve({ ok: false, empty: false, error: true });
+    };
+
+    img.src = url;
+  });
+}
+
+async function validateSlide2PortraitPhotos() {
+  const warning = document.getElementById("slide2PortraitWarning");
+  if (!warning) return true;
+
+  const result1 = await checkMultiImageIsPortrait("slide2Photos", 0);
+  const result2 = await checkMultiImageIsPortrait("slide2Photos", 1);
+
+  const problems = [];
+
+  if (!result1.empty && !result1.ok) {
+    problems.push("Photo 1 is not portrait.");
+  }
+
+  if (!result2.empty && !result2.ok) {
+    problems.push("Photo 2 is not portrait.");
+  }
+
+  if (problems.length) {
+    warning.innerHTML =
+      "⚠️ Slide 2 works best with portrait photos because the frame openings are vertical.<br>" +
+      problems.join("<br>");
+    warning.classList.remove("hidden");
+    return false;
+  }
+
+  warning.textContent = "";
+  warning.classList.add("hidden");
+  return true;
+}
+
+
+let uploadedMusicURL = null;
+let recorder = null;
+let recordedChunks = [];
+
+function setExportStatus(message, show = true) {
+  const status = document.getElementById("exportStatus");
+  if (!status) return;
+  status.innerHTML = message;
+  status.classList.toggle("hidden", !show);
+}
+
+function getTotalShowDuration() {
+  return Object.keys(layouts).reduce((total, key) => {
+    return total + (layouts[key].duration || 6000);
+  }, 0);
+}
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function waitForImage(img) {
+  return new Promise(resolve => {
+    if (!img) {
+      resolve();
+      return;
+    }
+
+    if (img.complete && img.naturalWidth > 0) {
+      resolve();
+      return;
+    }
+
+    img.onload = () => resolve();
+    img.onerror = () => resolve();
+  });
+}
+
+async function waitForAllSlideImages() {
+  const stage = document.getElementById("stage");
+  const images = [...stage.querySelectorAll("img")];
+
+  setExportStatus(`Loading ${images.length} image layers before export...`);
+
+  await Promise.all(images.map(waitForImage));
+
+  // Small extra breath so CSS layout/paint catches up before recording.
+  await wait(400);
+}
+
+function setupMusicUpload() {
+  const musicUpload = document.getElementById("musicUpload");
+  const musicPlayer = document.getElementById("musicPlayer");
+
+  if (!musicUpload || !musicPlayer) return;
+
+  musicUpload.addEventListener("change", () => {
+    const file = musicUpload.files && musicUpload.files[0];
+
+    if (!file) {
+      uploadedMusicURL = null;
+      musicPlayer.removeAttribute("src");
+      return;
+    }
+
+    uploadedMusicURL = URL.createObjectURL(file);
+    musicPlayer.src = uploadedMusicURL;
+    musicPlayer.load();
+
+    setExportStatus("Music loaded. It will be included in preview/export if your browser allows audio capture.");
+  });
+}
+
+function getSupportedRecorderMimeType() {
+  const types = [
+    "video/webm;codecs=vp9,opus",
+    "video/webm;codecs=vp8,opus",
+    "video/webm"
+  ];
+
+  return types.find(type => MediaRecorder.isTypeSupported(type)) || "";
+}
+
+function hideDownloadLink() {
+  const link = document.getElementById("videoDownloadLink");
+  if (!link) return;
+  link.classList.add("hidden");
+  link.removeAttribute("href");
+}
+
+function stopAnyMusic() {
+  const musicPlayer = document.getElementById("musicPlayer");
+  if (!musicPlayer) return;
+  musicPlayer.pause();
+  musicPlayer.currentTime = 0;
+}
+
+
+function showSelectedSlideControls() {
+  const selected = document.getElementById("slidePicker").value;
+
+  document.querySelectorAll(".slide-controls").forEach(panel => {
+    panel.classList.add("hidden");
+  });
+
+  const activePanel = document.getElementById(selected + "Controls");
+  if (activePanel) {
+    activePanel.classList.remove("hidden");
+  }
+
+  buildPreview();
+  previewSelectedSlide();
+}
+
+
+function buildPreview() {
+  photoURLs = [
+    fileToURL("photo1"),
+    multiFileToURL("slide2Photos", 0),
+    multiFileToURL("slide2Photos", 1)
+  ];
+
+  validateSlide2PortraitPhotos();
+
+  const stage = document.getElementById("stage");
+  stage.innerHTML = "";
+
+  Object.keys(layouts).forEach((key, index) => {
+    const layout = layouts[key];
+
+    if (key === "slide_03") {
+      stage.appendChild(buildThenNowSlide());
+      return;
+    }
+
+    if (key === "slide_04") {
+      stage.appendChild(buildMemoryOrbitSlide());
+      return;
+    }
+	
+	if (key === "slide_05") {
+	  stage.appendChild(buildScatteredMemoriesSlide());
+	  return;
+	}
+	if (key === "slide_06") {
+	  stage.appendChild(buildPolaroidStackSlide());
+	  return;
+	}
+	if (key === "slide_07") {
+	  stage.appendChild(buildSpotlightGallerySlide());
+	  return;
+	}
+	if (key === "slide_08") {
+	  stage.appendChild(buildFutureBeginsSlide());
+	  return;
+	}
+
+    if (key === "slide_09") {
+      stage.appendChild(buildSupportCircleSlide());
+      return;
+    }
+
+    if (key === "slide_10") {
+      stage.appendChild(buildGrandFinaleSlide());
+      return;
+    }
+
+
+    const slide = document.createElement("div");
+    slide.className = "slide";
+    slide.dataset.key = key;
+    slide.dataset.index = index;
+
+    const bg = document.createElement("img");
+    bg.className = "slide-bg";
+    bg.src = layout.bg;
+    slide.appendChild(bg);
+
+    layout.photos.forEach(p => {
+      const box = document.createElement("div");
+      box.className = "photo-box";
+      box.style.left = pct(p.x);
+      box.style.top = pct(p.y);
+      box.style.width = pct(p.w);
+      box.style.height = pct(p.h);
+
+      const img = document.createElement("img");
+      img.src = photoURLs[p.photoIndex] || "";
+      box.appendChild(img);
+
+      slide.appendChild(box);
+    });
+
+    layout.text.forEach(t => {
+      const text = document.createElement("div");
+      text.className = "text-box";
+      text.textContent = document.getElementById(t.input).value;
+      text.style.left = pct(t.x);
+      text.style.top = pct(t.y);
+      text.style.width = pct(t.w);
+      text.style.height = pct(t.h);
+      text.style.fontSize = t.size + "px";
+
+	if (t.font) {
+	  text.style.fontFamily = t.font;
+	}
+
+	if (t.fontWeight) {
+	  text.style.fontWeight = t.fontWeight;
+	}
+
+	if (t.letterSpacing) {
+	  text.style.letterSpacing = t.letterSpacing;
+	}
+
+	slide.appendChild(text);
+		});
+
+		stage.appendChild(slide);
+	  });
+	console.log("Slides built:", [...document.querySelectorAll(".slide")].map(s => s.dataset.key));
+	  previewSelectedSlide();
+	}
+
+
+
+function buildThenNowSlide() {
+  const slide = document.createElement("div");
+  slide.className = "slide";
+  slide.dataset.key = "slide_03";
+
+  const bg = document.createElement("img");
+  bg.className = "slide-bg";
+  bg.src = "slides/slide_03.png";
+  slide.appendChild(bg);
+
+  const frame = document.createElement("div");
+  frame.className = "then-now-frame";
+
+  const oldPhoto = document.createElement("img");
+  oldPhoto.className = "then-photo-old";
+  oldPhoto.src = fileToURL("photo4") || "";
+
+  const newPhoto = document.createElement("img");
+  newPhoto.className = "then-photo-new";
+  newPhoto.src = fileToURL("photo5") || "";
+
+  frame.appendChild(oldPhoto);
+  frame.appendChild(newPhoto);
+  slide.appendChild(frame);
+
+  const oldText = document.createElement("div");
+  oldText.className = "then-text-old";
+  oldText.textContent = document.getElementById("slide3Text1").value;
+  slide.appendChild(oldText);
+
+  const newText = document.createElement("div");
+  newText.className = "then-text-new";
+  newText.textContent = document.getElementById("slide3Text2").value;
+  slide.appendChild(newText);
+
+  return slide;
+}
+function resetAnimations(slide) {
+  slide.querySelectorAll(
+    ".photo-box img, .text-box, .then-now-frame, .then-photo-old, .then-photo-new, .then-text-old, .then-text-new, .memory-orbit, .memory-orbit-text, .scatter-card, .scatter-text, .polaroid-card, .polaroid-text, .gallery-photo, .gallery-text, .gallery-beam, .future-photo img, .future-text, .future-sweep, .finale-hero img, .finale-memory, .finale-text, .finale-shine"
+	
+  ).forEach(el => {
+    el.style.animation = "none";
+    el.offsetHeight;
+    el.style.animation = "";
+  });
+}
+function showSlideByIndex(index) {
+  const slides = document.querySelectorAll(".slide");
+
+  slides.forEach(slide => {
+    slide.classList.remove("active");
+  });
+
+  const slide = slides[index];
+  if (!slide) return;
+
+  resetAnimations(slide);
+  slide.classList.add("active");
+  currentSlideIndex = index;
+}
+
+function buildScatteredMemoriesSlide() {
+  const slide = document.createElement("div");
+  slide.className = "slide";
+  slide.dataset.key = "slide_05";
+
+  const bg = document.createElement("img");
+  bg.className = "scatter-bg";
+  bg.src = "slides/slide_05.png";
+  slide.appendChild(bg);
+
+  const positions = [
+    { left: "8%",  top: "14%" },
+    { left: "33%", top: "9%" },
+    { left: "68%", top: "15%" },
+    { left: "18%", top: "63%" },
+    { left: "62%", top: "63%" }
+  ];
+
+  [0, 1, 2, 3, 4].forEach((photoNumber, i) => {
+    const card = document.createElement("div");
+    card.className = `scatter-card p${i + 1}`;
+    card.style.left = positions[i].left;
+    card.style.top = positions[i].top;
+
+    const img = document.createElement("img");
+    img.src = multiFileToURL("slide5Photos", photoNumber) || "";
+
+    card.appendChild(img);
+    slide.appendChild(card);
+  });
+
+  const text = document.createElement("div");
+  text.className = "scatter-text";
+  text.textContent = document.getElementById("slide5Text").value;
+  slide.appendChild(text);
+
+  return slide;
+}
+
+
+function buildMemoryOrbitSlide() {
+  const slide = document.createElement("div");
+  slide.className = "slide";
+  slide.dataset.key = "slide_04";
+
+  const bg = document.createElement("img");
+  bg.className = "slide-bg";
+  bg.src = "slides/slide_04.png";
+  slide.appendChild(bg);
+
+  const center = document.createElement("div");
+  center.className = "memory-center";
+
+  const centerImg = document.createElement("img");
+  centerImg.src = fileToURL("slide4CenterPhoto") || "";
+  center.appendChild(centerImg);
+  slide.appendChild(center);
+
+  const orbit = document.createElement("div");
+  orbit.className = "memory-orbit";
+
+  [0, 1, 2, 3].forEach((photoNumber) => {
+const box = document.createElement("div");
+box.className = "orbit-photo";
+
+const img = document.createElement("img");
+img.src = multiFileToURL("slide4Photos", photoNumber) || "";
+
+box.appendChild(img);
+orbit.appendChild(box);
+  });
+
+  slide.appendChild(orbit);
+
+  const text = document.createElement("div");
+  text.className = "memory-orbit-text";
+  text.textContent = document.getElementById("slide4Text").value;
+  slide.appendChild(text);
+
+  return slide;
+}
+
+function buildPolaroidStackSlide() {
+  const slide = document.createElement("div");
+  slide.className = "slide";
+  slide.dataset.key = "slide_06";
+
+  const bg = document.createElement("img");
+  bg.className = "polaroid-bg";
+  bg.src = "slides/slide_06.png";
+  slide.appendChild(bg);
+
+  const stack = document.createElement("div");
+  stack.className = "polaroid-stack";
+
+  [0, 1, 2, 3, 4, 5].forEach((photoNumber, i) => {
+    const card = document.createElement("div");
+    card.className = `polaroid-card p${i + 1}`;
+
+    const img = document.createElement("img");
+    img.src = multiFileToURL("slide6Photos", photoNumber) || "";
+
+    card.appendChild(img);
+
+    const captionsOn = document.getElementById("polaroidCaptionsOn")?.checked;
+
+    if (captionsOn) {
+      const caption = document.createElement("div");
+      caption.className = "polaroid-caption";
+      caption.textContent = document.getElementById(`polaroidCaption${i + 1}`)?.value || "";
+      card.appendChild(caption);
+    }
+
+    stack.appendChild(card);
+  });
+
+  slide.appendChild(stack);
+
+  const text = document.createElement("div");
+  text.className = "polaroid-text";
+  text.textContent = document.getElementById("slide6Text").value;
+  slide.appendChild(text);
+
+  return slide;
+}
+
+function buildSpotlightGallerySlide() {
+  const slide = document.createElement("div");
+  slide.className = "slide";
+  slide.dataset.key = "slide_07";
+
+  const bg = document.createElement("img");
+  bg.className = "gallery-bg";
+  bg.src = "slides/slide_07.png";
+  slide.appendChild(bg);
+
+  const beam = document.createElement("div");
+  beam.className = "gallery-beam";
+  slide.appendChild(beam);
+
+  [0, 1, 2, 3, 4, 5].forEach((photoNumber, i) => {
+    const box = document.createElement("div");
+    box.className = `gallery-photo g${i + 1}`;
+
+    const img = document.createElement("img");
+    img.src = multiFileToURL("slide7Photos", photoNumber) || "";
+
+    box.appendChild(img);
+    slide.appendChild(box);
+  });
+
+  const text = document.createElement("div");
+  text.className = "gallery-text";
+  text.textContent = document.getElementById("slide7Text").value;
+
+  slide.appendChild(text);
+
+  return slide;
+}
+
+
+
+function buildSupportCircleSlide() {
+  const slide = document.createElement("div");
+  slide.className = "slide";
+  slide.dataset.key = "slide_09";
+
+  const bg = document.createElement("img");
+  bg.className = "support-bg";
+  bg.src = "slides/slide_09.png";
+  slide.appendChild(bg);
+
+  const main = document.createElement("div");
+  main.className = "support-main";
+
+  const mainImg = document.createElement("img");
+  mainImg.src = multiFileToURL("slide9Photos", 0) || "";
+  main.appendChild(mainImg);
+  slide.appendChild(main);
+
+  [1, 2, 3, 4].forEach((photoNumber, i) => {
+    const box = document.createElement("div");
+    box.className = `support-small s${i + 1}`;
+
+    const img = document.createElement("img");
+    img.src = multiFileToURL("slide9Photos", photoNumber) || "";
+
+    box.appendChild(img);
+    slide.appendChild(box);
+  });
+
+  const text = document.createElement("div");
+  text.className = "support-text";
+  text.textContent = document.getElementById("slide9Text").value;
+  slide.appendChild(text);
+
+  return slide;
+}
+
+
+function buildGrandFinaleSlide() {
+  const slide = document.createElement("div");
+  slide.className = "slide";
+  slide.dataset.key = "slide_10";
+
+  const bg = document.createElement("img");
+  bg.className = "finale-bg";
+  bg.src = "slides/slide_10.png";
+  slide.appendChild(bg);
+
+  const hero = document.createElement("div");
+  hero.className = "finale-hero";
+
+  const heroImg = document.createElement("img");
+  heroImg.src = multiFileToURL("slide10Photos", 0) || "";
+  setPhotoOrientationClass(heroImg, hero);
+  hero.appendChild(heroImg);
+  slide.appendChild(hero);
+
+  [1, 2, 3, 4, 5, 6].forEach((photoNumber, i) => {
+    const box = document.createElement("div");
+    box.className = `finale-memory m${i + 1}`;
+
+    const img = document.createElement("img");
+    img.src = multiFileToURL("slide10Photos", photoNumber) || "";
+    setPhotoOrientationClass(img, box);
+
+    box.appendChild(img);
+    slide.appendChild(box);
+  });
+
+  const text = document.createElement("div");
+  text.className = "finale-text";
+  text.textContent = document.getElementById("slide10Text").value;
+  slide.appendChild(text);
+
+  const shine = document.createElement("div");
+  shine.className = "finale-shine";
+  slide.appendChild(shine);
+
+  return slide;
+}
+
+function previewSelectedSlide() {
+  clearTimeout(timer);	
+
+  const selected = document.getElementById("slidePicker").value;
+  const slides = document.querySelectorAll(".slide");
+
+  slides.forEach(slide => {
+    slide.classList.remove("active");
+  });
+
+  const target = document.querySelector(`.slide[data-key="${selected}"]`);
+
+  if (!target) {
+    console.log("Could not find slide:", selected);
+    return;
+  }
+
+  resetAnimations(target);
+  target.classList.add("active");
+}
+function togglePolaroidCaptions() {
+  const enabled = document.getElementById("polaroidCaptionsOn").checked;
+  document.getElementById("polaroidCaptionFields").classList.toggle("hidden", !enabled);
+  buildPreview();
+  previewSelectedSlide();
+}
+
+function buildFutureBeginsSlide() {
+
+  const slide = document.createElement("div");
+  slide.className = "slide";
+  slide.dataset.key = "slide_08";
+
+  const photo = document.createElement("div");
+  photo.className = "future-photo";
+
+  const img = document.createElement("img");
+  img.src = fileToURL("photo28") || "";
+
+  photo.appendChild(img);
+  slide.appendChild(photo);
+
+  const bg = document.createElement("img");
+  bg.className = "future-bg";
+  bg.src = "slides/slide_08.png";
+  slide.appendChild(bg);
+
+  const sweep = document.createElement("div");
+  sweep.className = "future-sweep";
+  slide.appendChild(sweep);
+
+  const text = document.createElement("div");
+  text.className = "future-text";
+  text.textContent =
+    document.getElementById("slide8Text").value;
+
+  slide.appendChild(text);
+
+  return slide;
+}
+
+
+
+function playShow() {
+  clearTimeout(timer);
+
+  const slides = document.querySelectorAll(".slide");
+
+  if (!slides.length) {
+    buildPreview();
+  }
+
+  const keys = Object.keys(layouts);
+  let index = 0;
+
+  function playNextSlide() {
+    if (index >= keys.length) {
+      clearTimeout(timer);
+      return;
+    }
+
+    const key = keys[index];
+    const duration = layouts[key].duration || 6000;
+
+    const slideIndex = [...document.querySelectorAll(".slide")]
+      .findIndex(slide => slide.dataset.key === key);
+
+    showSlideByIndex(slideIndex);
+
+    index++;
+
+    timer = setTimeout(playNextSlide, duration);
+  }
+
+  playNextSlide();
+}
+
+
+const slide2MultiInput = document.getElementById("slide2Photos");
+if (slide2MultiInput) {
+  slide2MultiInput.addEventListener("change", () => {
+    validateSlide2PortraitPhotos();
+    buildPreview();
+    previewSelectedSlide();
+  });
+}
+
+
+setupMusicUpload();
+
+buildPreview();
+showSelectedSlideControls();
+</script>
+<script src="graduation_renderer.js"></script>
+</body>
+</html>
