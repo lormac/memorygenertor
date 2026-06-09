@@ -154,17 +154,19 @@ function wait(ms) {
 async function loadAssets() {
   setStatus("Loading all slide backgrounds and photos...");
 
-  return {
-    bg1: await loadImg("slides/slide_01.png"),
-    bg2: await loadImg("slides/slide_02.png"),
-    bg3: await loadImg("slides/slide_03.png"),
-    bg4: await loadImg("slides/slide_04.png"),
-    bg5: await loadImg("slides/slide_05.png"),
-    bg6: await loadImg("slides/slide_06.png"),
-    bg7: await loadImg("slides/slide_07.png"),
-    bg8: await loadImg("slides/slide_08.png"),
-    bg9: await loadImg("slides/slide_09.png"),
-    bg10: await loadImg("slides/slide_10.png"),
+  const THEME_PATH = "themes/graduations/black_gold";
+
+return {
+  bg1: await loadImg(`${THEME_PATH}/slides/slide_01.png`),
+  bg2: await loadImg(`${THEME_PATH}/slides/slide_02.png`),
+  bg3: await loadImg(`${THEME_PATH}/slides/slide_03.png`),
+  bg4: await loadImg(`${THEME_PATH}/slides/slide_04.png`),
+  bg5: await loadImg(`${THEME_PATH}/slides/slide_05.png`),
+  bg6: await loadImg(`${THEME_PATH}/slides/slide_06.png`),
+  bg7: await loadImg(`${THEME_PATH}/slides/slide_07.png`),
+  bg8: await loadImg(`${THEME_PATH}/slides/slide_08.png`),
+  bg9: await loadImg(`${THEME_PATH}/slides/slide_09.png`),
+  bg10: await loadImg(`${THEME_PATH}/slides/slide_10.png`),
 
     photo1: await loadFile("photo1"),
 
