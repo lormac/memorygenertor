@@ -1,7 +1,9 @@
 {
   "DINO234": {
-    "products": [
-      "dino_birthday"
-    ]
+    "products": ["dino_birthday"]
+  },
+
+  "GRAD234": {
+    "products": ["graduation_black_gold"]
   }
 }

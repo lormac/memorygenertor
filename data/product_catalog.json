@@ -1,8 +1,17 @@
 {
   "dino_birthday": {
     "title": "Dinosaur Birthday Slideshow",
-    "generator": "slideshow",
     "type": "slideshow",
+    "engine": "birthday_simple",
+    "generator": "slideshow_birthday_simple",
     "themeManifest": "/themes/birthday/child_birthday/dino_birthday/theme.json"
+  },
+
+  "graduation_black_gold": {
+    "title": "Black Gold Graduation Slideshow",
+    "type": "slideshow",
+    "engine": "graduation_premium",
+    "generator": "slideshow_graduation_premium",
+    "themeManifest": "/themes/graduation/black_gold/theme.json"
   }
 }
